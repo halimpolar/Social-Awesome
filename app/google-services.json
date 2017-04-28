@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "502561435056",
+    "firebase_url": "https://social-awesome.firebaseio.com",
+    "project_id": "social-awesome",
+    "storage_bucket": "social-awesome.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502561435056:android:a14c4cda38774dd5",
+        "android_client_info": {
+          "package_name": "cmpe.sjsu.socialawesome"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "502561435056-jfijjbs35i314njuhdlbji67qecdudt8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBmN6LfVluf3GhMt3jN2Q0Exk9NWhhCbk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

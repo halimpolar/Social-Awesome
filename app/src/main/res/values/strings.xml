@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">SocialAwesome</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="email">Email</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="signup">Sign up</string>
+    <string name="submit">Submit</string>
+    <string name="create_account_text">Click here to create account</string>
+    <string name="signin_text">Click here to login</string>
 </resources>
