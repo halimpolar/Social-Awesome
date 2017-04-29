@@ -1,187 +1,140 @@
 package cmpe.sjsu.socialawesome;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
-
-import cmpe.sjsu.socialawesome.Utils.UserAuth;
-import cmpe.sjsu.socialawesome.models.User;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.toString();
-    private static final String USERS_TABLE = "users";
-    private EditText mEmailEt;
-    private EditText mPasswordEt;
-    private FirebaseAuth mAuth;
-    private Button mSubmitBtn;
-    private EditText mConfirmPasswordEt;
-    private TextView mCreateAccountTv;
-    private EditText mFirstNameEt;
-    private EditText mLastNameEt;
-    private boolean mIsLogin = true;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private List<String> mDrawerListTitles = new ArrayList<>();
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private SocialFragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_layout);
-        mAuth = FirebaseAuth.getInstance();
+        setContentView(R.layout.activity_main);
 
-        mSubmitBtn = (Button) findViewById(R.id.submit);
-        mEmailEt = (EditText) findViewById(R.id.email);
-        mPasswordEt = (EditText) findViewById(R.id.password);
-        mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
-        mFirstNameEt = (EditText) findViewById(R.id.first_name);
-        mLastNameEt = (EditText) findViewById(R.id.last_name);
-        mCreateAccountTv = (TextView) findViewById(R.id.create_account_text);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        mCreateAccountTv.setOnClickListener(new View.OnClickListener() {
+        mDrawerListTitles.add(getString(R.string.timeline));
+        mDrawerListTitles.add(getString(R.string.profile));
+        mDrawerListTitles.add(getString(R.string.friends));
+        mDrawerListTitles.add(getString(R.string.setting));
+
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, mDrawerListTitles));
+
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                setupUI(!mIsLogin);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SocialFragment fragment = null;
+                String title = null;
+                switch (position) {
+                    case 0:
+                        //Timeline
+                        title = getString(R.string.timeline);
+                        fragment = new TimeLineFragment();
+                        break;
+                    case 1:
+                        //Profile
+                        title = getString(R.string.profile);
+                        fragment = new ProfileFragment();
+                        break;
+                    case 2:
+                        //Friends
+                        title = getString(R.string.friends);
+                        fragment = new FriendFragment();
+                        break;
+                    case 3:
+                        //Setting
+                        title = getString(R.string.setting);
+                        fragment = new SettingFragment();
+                        break;
+                    default:
+                        break;
+                }
+
+                if (fragment != null && !fragment.getTitle().equals(title)) {
+                    mCurrentFragment = fragment;
+
+                    FragmentManager fm = getSupportFragmentManager();
+                    FragmentTransaction transaction = fm.beginTransaction();
+                    transaction.replace(R.id.content_frame, fragment);
+                    transaction.commit();
+                }
             }
         });
 
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.string.drawer_open, R.string.drawer_close) {
 
-        mSubmitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mIsLogin) {
-                    createAccount(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
-                } else {
-                    signIn(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
-                }
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                if (getSupportActionBar() == null) return;
+                invalidateOptionsMenu();
             }
-        });
 
-        setupUI(true);
-    }
-
-
-    private void signIn(String email, String password) {
-        Log.d(TAG, "signIn:" + email);
-        if (!validate()) {
-            return;
-        }
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            successLogin(mAuth.getCurrentUser());
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            //TODO: Display failure message
-
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
-        if (!validate()) {
-            //TODO: show error message
-            return;
-        }
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "createUserWithEmail:success");
-                            successLogin(mAuth.getCurrentUser());
-
-                        } else {
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-
-                            //TODO: show error message onscreen instead of toast
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    private boolean validate() {
-        //TODO: do validation on the input
-        return true;
-    }
-
-    private void successLogin(FirebaseUser fbUser) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        if (!mIsLogin) {
-            User user = new User();
-            user.email = fbUser.getEmail();
-            user.first_name = mFirstNameEt.getText().toString();
-            user.last_name = mLastNameEt.getText().toString();
-//            user.nickname = "Nick";
-
-            Task task = ref.child(fbUser.getUid()).setValue(user);
-
-            if (task.isSuccessful()) {
-                UserAuth.getInstance().setCurrentUser(user);
-                Log.d(TAG, "Successfully create user in db");
-            } else {
-                //TODO: show text fail to save user to db
-                Log.e(TAG, "Fail to save user to db");
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                if (getSupportActionBar() == null) return;
+                invalidateOptionsMenu();
             }
-        } else {
-            ref.runTransaction(new Transaction.Handler() {
-                @Override
-                public Transaction.Result doTransaction(MutableData mutableData) {
-                    User user = mutableData.getValue(User.class);
-                    UserAuth.getInstance().setCurrentUser(user);
+        };
 
-                    return Transaction.success(mutableData);
-                }
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-                @Override
-                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-                }
-            });
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
         }
     }
 
-    private void setupUI(boolean isLogin) {
-        mIsLogin = isLogin;
-        if (isLogin) {
-            mFirstNameEt.setVisibility(View.GONE);
-            mLastNameEt.setVisibility(View.GONE);
-            mConfirmPasswordEt.setVisibility(View.GONE);
-            mSubmitBtn.setText(getString(R.string.login));
-            mCreateAccountTv.setText(getString(R.string.create_account_text));
-        } else {
-            mFirstNameEt.setVisibility(View.VISIBLE);
-            mLastNameEt.setVisibility(View.VISIBLE);
-            mConfirmPasswordEt.setVisibility(View.VISIBLE);
-            mSubmitBtn.setText(getString(R.string.signup));
-            mCreateAccountTv.setText(R.string.signin_text);
-        }
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+//        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
