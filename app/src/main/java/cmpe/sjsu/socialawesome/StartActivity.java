@@ -149,6 +149,7 @@ public class StartActivity extends AppCompatActivity {
 
             if (task.isSuccessful()) {
                 UserAuth.getInstance().setCurrentUser(user);
+//                UserAuth.getInstance().setCurrentUserSummary(user);
                 launchMainActivity();
                 Log.d(TAG, "Successfully create user in db");
             } else {
@@ -162,6 +163,7 @@ public class StartActivity extends AppCompatActivity {
                     User user = mutableData.getValue(User.class);
                     if (user != null) {
                         UserAuth.getInstance().setCurrentUser(user);
+//                        UserAuth.getInstance().setCurrentUserSummary(user);
                         launchMainActivity();
                     }
                     return Transaction.success(mutableData);

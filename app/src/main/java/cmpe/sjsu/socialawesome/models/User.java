@@ -9,6 +9,11 @@ import java.util.List;
  */
 @IgnoreExtraProperties
 public class User {
+    public static final String FRIEND_LIST = "friends";
+    public static final String WAITING_FRIEND_LIST = "waitingFriends";
+    public static final String FOLOWING_FRIEND_LIST = "followingFriends";
+    public static final String FOLLOWER_LIST = "follower";
+    public static final String PENDING_FRIEND_LIST = "pendingFriends";
     public String id;
     public String email;
     public String first_name;
@@ -36,6 +41,9 @@ public class User {
 
     // List of friend this user sent invitation to
     public List<UserSummary> followingFriends;
+
+    // List of person who follow me
+    public List<UserSummary> follower;
 
     // List of friends that sent invitation to this user
     public List<UserSummary> pendingFriends;
