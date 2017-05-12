@@ -28,67 +28,6 @@ public class FriendFragment extends SocialFragment {
     public void onStart() {
         super.onStart();
         UserSummary mySummary = UserAuth.getInstance().getCurrentUserSummary();
-        FriendUtils.addFriend(getActivity(), 0, mySummary);
+        FriendUtils.addFriend(getActivity(), 1, mySummary);
     }
-
-//    public void followPerson(final UserSummary summaryReceive) {
-//        if (summaryReceive.status == 2) {
-//            final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-//            final DatabaseReference currentUserRef = userTableRef.child(UserAuth.getInstance().getCurrentUser().id);
-//            final DatabaseReference currentUserFollowRef = currentUserRef.child(FOLOWING_FRIEND_LIST);
-//            final String receiveName = summaryReceive.first_name + summaryReceive.last_name;
-//
-//            currentUserFollowRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if (dataSnapshot.child(summaryReceive.id).exists()) {
-//                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-//                        alertDialogBuilder.setTitle("Error");
-//                        alertDialogBuilder
-//                                .setMessage("You already followed " + receiveName + "!")
-//                                .setCancelable(false)
-//                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int id) {
-//                                        dialog.cancel();
-//                                    }
-//                                });
-//                        AlertDialog alertDialog = alertDialogBuilder.create();
-//                        alertDialog.show();
-//                    } else {
-//                        currentUserRef.child(FOLOWING_FRIEND_LIST).child(summaryReceive.id).setValue(summaryReceive);
-//                        userTableRef.child(summaryReceive.id).child(FOLLOWER_LIST).child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getInstance().getCurrentUserSummary());
-//                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-//                        alertDialogBuilder.setTitle("Success");
-//                        alertDialogBuilder
-//                                .setMessage("You are now following " + receiveName + "!")
-//                                .setCancelable(false)
-//                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int id) {
-//                                        dialog.cancel();
-//                                    }
-//                                });
-//                        AlertDialog alertDialog = alertDialogBuilder.create();
-//                        alertDialog.show();
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                }
-//            });
-//        } else {
-//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-//            alertDialogBuilder.setTitle("Error");
-//            alertDialogBuilder
-//                    .setMessage("You can't follow user whose profile is not public!")
-//                    .setCancelable(false)
-//                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            dialog.cancel();
-//                        }
-//                    });
-//            AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.show();
-//        }
-//    }
 }

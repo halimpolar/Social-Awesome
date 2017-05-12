@@ -5,5 +5,5 @@ package cmpe.sjsu.socialawesome.models;
  */
 
 public class PushMessage {
-    public
+//    public
 }
