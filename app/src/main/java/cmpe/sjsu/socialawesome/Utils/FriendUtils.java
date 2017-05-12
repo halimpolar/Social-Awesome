@@ -36,22 +36,22 @@ public class FriendUtils {
     public static void addFriendByEmail(final Context context, final String email) {
         DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         Query query = userTableRef.orderByChild("email").equalTo(email);
-        System.out.println(email);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot == null) {
-//
-//                } else {
+                if (dataSnapshot.getValue() == null) {
+//                    System.out.println(email);
+                    emailFriendRequest(context, email);
+                } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);
                         getUserSummary(user);
-                        if(user.email.equals(email)) {
+//                        if(user.email.equals(email)) {
                             addFriend(context, 0, mSummary);
-                        }else{
-                            emailFriendRequest(context, email);
-                        }
-//                    }
+//                        }else{
+//
+//                        }
+                    }
                 }
             }
             @Override
