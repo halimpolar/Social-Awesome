@@ -11,7 +11,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import cmpe.sjsu.socialawesome.models.User;
 import cmpe.sjsu.socialawesome.models.UserSummary;
+import com.google.firebase.auth.*;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 import static cmpe.sjsu.socialawesome.models.User.FOLLOWER_LIST;
@@ -26,22 +28,31 @@ import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
 public class FriendUtils {
 
     public static void addFriendbyEmail(Context context, String email) {
-        UserSummary summaryReceive = new UserSummary();
+        final UserSummary summaryReceive = new UserSummary();
+//        final UserSummary summaryReceive = UserAuth.getInstance().getCurrentUserSummary();
         DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         Query query = userTableRef.orderByChild("email").equalTo(email);
-        query.addValueEventListener(new ValueEventListener() {
+        System.out.println(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("26666666666666666666");
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    //TODO get the data here
-
+                    System.out.println("26666666666666666666");
+                    User user = postSnapshot.getValue(User.class);
+                    System.out.println("26666666666666666666");
+                    String firstName = user.first_name;
+                    System.out.println(firstName);
+//                    summaryReceive.id = user.id;
+//                    summaryReceive.email = user.email;
+//                    summaryReceive.first_name = user.first_name;
+//                    summaryReceive.last_name = user.last_name;
+//                    summaryReceive.profilePhotoURL = user.profilePhotoURL;
+//                    summaryReceive.status = 2;
                 }
-
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
