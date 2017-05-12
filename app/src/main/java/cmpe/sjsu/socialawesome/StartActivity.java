@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.User;
@@ -138,12 +139,15 @@ public class StartActivity extends AppCompatActivity {
 
     private void successLogin(FirebaseUser fbUser) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
+        final String token = FirebaseInstanceId.getInstance().getToken();
+
         if (!mIsLogin) {
             User user = new User();
             user.id = fbUser.getUid();
             user.email = fbUser.getEmail();
             user.first_name = mFirstNameEt.getText().toString();
             user.last_name = mLastNameEt.getText().toString();
+            user.token = token;
 
             Task task = ref.child(fbUser.getUid()).setValue(user);
 
@@ -162,6 +166,10 @@ public class StartActivity extends AppCompatActivity {
                 public Transaction.Result doTransaction(MutableData mutableData) {
                     User user = mutableData.getValue(User.class);
                     if (user != null) {
+                        if (token != null && !token.equals(user.token)) {
+                            user.token = token;
+                        }
+
                         UserAuth.getInstance().setCurrentUser(user);
 //                        UserAuth.getInstance().setCurrentUserSummary(user);
                         launchMainActivity();
