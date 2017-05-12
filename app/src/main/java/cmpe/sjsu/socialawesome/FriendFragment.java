@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import cmpe.sjsu.socialawesome.Utils.FriendUtils;
+import cmpe.sjsu.socialawesome.Utils.UserAuth;
+import cmpe.sjsu.socialawesome.models.UserSummary;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,11 +28,11 @@ public class FriendFragment extends SocialFragment {
     public void onStart() {
         super.onStart();
         //add friend and follow on profile
-//        UserSummary mySummary = UserAuth.getInstance().getCurrentUserSummary();
-//        FriendUtils.addFriend(getActivity(), 1, mySummary);
+        UserSummary mySummary = UserAuth.getInstance().getCurrentUserSummary();
+        FriendUtils.addFriend(getActivity(), 1, mySummary);
 
         //add friend by email
 //        FriendUtils.addFriendByEmail(getActivity(),"lam.tran@sjsu.edu");
-        FriendUtils.addFriendByEmail(getActivity(),"sheilashi0112@gmail.com");
+//        FriendUtils.addFriendByEmail(getActivity(),"sheilashi0112@gmail.com");
     }
 }
