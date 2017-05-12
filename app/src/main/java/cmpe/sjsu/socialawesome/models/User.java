@@ -3,6 +3,7 @@ package cmpe.sjsu.socialawesome.models;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lam on 4/27/17.
@@ -34,18 +35,18 @@ public class User {
     public boolean notification;
 
     // List of friend already establish
-    public List<UserSummary> friends;
+    public Map<String, UserSummary> friends;
 
     // List of friend this user sent invitation to
-    public List<UserSummary> waitingFriends;
+    public Map<String, UserSummary> waitingFriends;
 
     // List of friend this user sent invitation to
-    public List<UserSummary> followingFriends;
+    public Map<String, UserSummary> followingFriends;
 
     // List of person who follow me
-    public List<UserSummary> follower;
+    public Map<String, UserSummary> follower;
 
     // List of friends that sent invitation to this user
-    public List<UserSummary> pendingFriends;
+    public Map<String, UserSummary> pendingFriends;
 
 }
