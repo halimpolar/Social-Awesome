@@ -15,6 +15,7 @@ import java.util.Map;
 
 import cmpe.sjsu.socialawesome.StartActivity;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
+import cmpe.sjsu.socialawesome.models.User;
 
 /**
  * Created by lam on 5/11/17.
@@ -34,10 +35,10 @@ public class SocialInstanceIDService extends FirebaseInstanceIdService {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot == null) return;
-                if (dataSnapshot.child("token") == null || !dataSnapshot.child("token").equals(FirebaseInstanceId.getInstance().getToken())) {
+                if (dataSnapshot.child(User.TOKEN) == null || !dataSnapshot.child(User.TOKEN).equals(FirebaseInstanceId.getInstance().getToken())) {
                     UserAuth.getInstance().getCurrentUser().token = FirebaseInstanceId.getInstance().getToken();
                     Map<String, Object> map = new HashMap<>();
-                    map.put("token", FirebaseInstanceId.getInstance().getToken());
+                    map.put(User.TOKEN, FirebaseInstanceId.getInstance().getToken());
                     ref.updateChildren(map);
                 }
             }

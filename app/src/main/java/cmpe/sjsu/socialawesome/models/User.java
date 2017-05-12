@@ -1,9 +1,7 @@
 package cmpe.sjsu.socialawesome.models;
 
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,6 +9,7 @@ import java.util.Map;
  */
 @IgnoreExtraProperties
 public class User {
+    public static final String TOKEN = "token";
     public static final String FRIEND_LIST = "friends";
     public static final String WAITING_FRIEND_LIST = "waitingFriends";
     public static final String FOLOWING_FRIEND_LIST = "followingFriends";
