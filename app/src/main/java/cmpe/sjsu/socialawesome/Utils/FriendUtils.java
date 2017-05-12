@@ -3,6 +3,8 @@ package cmpe.sjsu.socialawesome.Utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import cmpe.sjsu.socialawesome.models.User;
 import cmpe.sjsu.socialawesome.models.UserSummary;
+
 import com.google.firebase.auth.*;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
@@ -21,44 +24,74 @@ import static cmpe.sjsu.socialawesome.models.User.FOLOWING_FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.PENDING_FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
 
+
+
 /**
  * Created by bing on 5/11/17.
  */
 
 public class FriendUtils {
+    private static UserSummary mSummary = new UserSummary();
 
-    public static void addFriendbyEmail(Context context, String email) {
-        final UserSummary summaryReceive = new UserSummary();
-//        final UserSummary summaryReceive = UserAuth.getInstance().getCurrentUserSummary();
+    public static void addFriendByEmail(final Context context, final String email) {
         DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         Query query = userTableRef.orderByChild("email").equalTo(email);
         System.out.println(email);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println("26666666666666666666");
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    System.out.println("26666666666666666666");
-                    User user = postSnapshot.getValue(User.class);
-                    System.out.println("26666666666666666666");
-                    String firstName = user.first_name;
-                    System.out.println(firstName);
-//                    summaryReceive.id = user.id;
-//                    summaryReceive.email = user.email;
-//                    summaryReceive.first_name = user.first_name;
-//                    summaryReceive.last_name = user.last_name;
-//                    summaryReceive.profilePhotoURL = user.profilePhotoURL;
-//                    summaryReceive.status = 2;
+//                if (dataSnapshot == null) {
+//
+//                } else {
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        User user = postSnapshot.getValue(User.class);
+                        getUserSummary(user);
+                        if(user.email.equals(email)) {
+                            addFriend(context, 0, mSummary);
+                        }else{
+                            emailFriendRequest(context, email);
+                        }
+//                    }
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
-        addFriend(context, 0, summaryReceive);
     }
 
+    public static void getUserSummary(User user) {
+        mSummary.id = user.id;
+        mSummary.email = user.email;
+        mSummary.first_name = user.first_name;
+        mSummary.last_name = user.last_name;
+        mSummary.profilePhotoURL = user.profilePhotoURL;
+        mSummary.status = user.status;
+    }
+
+    private static void emailFriendRequest(Context context, String email){
+        Mail m = new Mail("bingtest0112@gmail.com", "01120112");
+
+        String[] toArr = {email};
+        m.setTo(toArr);
+        m.setFrom("bingtest0112@gmail.com");
+        m.setSubject("This is an email sent using my Mail JavaMail wrapper from an Android device.");
+        m.setBody("Email body.");
+
+        try {
+            m.addAttachment("/sdcard/filelocation");
+
+            if(m.send()) {
+                Toast.makeText(context, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(context, "Email was not sent.", Toast.LENGTH_LONG).show();
+            }
+        } catch(Exception e) {
+            //Toast.makeText(MailApp.this, "There was a problem sending the email.", Toast.LENGTH_LONG).show();
+            Log.e("MailApp", "Could not send email", e);
+        }
+
+    }
     //type: 0-friend, 1-follow
     public static void addFriend(final Context context, int type, final UserSummary summaryReceive) {
         String nodeSent = null;
