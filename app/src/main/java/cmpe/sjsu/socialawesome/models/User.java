@@ -1,5 +1,6 @@
 package cmpe.sjsu.socialawesome.models;
 
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class User {
     public String profession;
     public String aboutMe;
     public String intestes;
-
+    public String token;
 
     // 0 -- disable
     // 1 -- friends only view
