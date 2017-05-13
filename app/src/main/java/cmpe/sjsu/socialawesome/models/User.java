@@ -47,7 +47,7 @@ public class User {
     // List of person who follow me
     public Map<String, UserSummary> follower;
 
-    // List of friends that sent invitation to this user
+    // List of friends that sent invitation to this user, pending friend request
     public Map<String, UserSummary> pendingFriends;
 
 }

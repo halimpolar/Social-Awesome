@@ -27,12 +27,7 @@ public class FriendFragment extends SocialFragment {
     @Override
     public void onStart() {
         super.onStart();
-        //add friend and follow on profile
-        UserSummary mySummary = UserAuth.getInstance().getCurrentUserSummary();
-        FriendUtils.addFriend(getActivity(), 1, mySummary);
 
-        //add friend by email
-//        FriendUtils.addFriendByEmail(getActivity(),"lam.tran@sjsu.edu");
-//        FriendUtils.addFriendByEmail(getActivity(),"sheilashi0112@gmail.com");
+
     }
 }
