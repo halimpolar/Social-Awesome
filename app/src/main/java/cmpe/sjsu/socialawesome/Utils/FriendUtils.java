@@ -3,6 +3,7 @@ package cmpe.sjsu.socialawesome.Utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public class FriendUtils {
 //        FriendUtils.addFriendByEmail(getActivity(),"lam.tran@sjsu.edu");
 //        FriendUtils.addFriendByEmail(getActivity(),"sheilashi0112@gmail.com");
     public static void addFriendByEmail(final Context context, final String email) {
+
         final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         Query query = userTableRef.orderByChild("email").equalTo(email);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -48,7 +50,7 @@ public class FriendUtils {
                     }).start();
                     UserSummary newUserSummary = new UserSummary();
                     newUserSummary.email = email;
-                    userTableRef.child(UserAuth.getInstance().getCurrentUser().id).child(PENDING_FRIEND_LIST).push().setValue(newUserSummary);
+                    userTableRef.child(UserAuth.getInstance().getCurrentUser().id).child(WAITING_FRIEND_LIST).push().setValue(newUserSummary);
                 } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);
@@ -73,21 +75,21 @@ public class FriendUtils {
         mSummary.status = user.status;
     }
 
-    private static void emailFriendRequest(Context context, String email, UserSummary userSummary) {
+    private static void emailFriendRequest(final Context context, final String email, final UserSummary userSummary) {
         Mail m = new Mail("bingtest0112@gmail.com", "01120112");
         String[] toArr = {email};
         m.setTo(toArr);
-        m.setFrom("SocialAwesome");
+        m.setFrom("bingtest0112@gmail.com");
         m.setSubject("Invitation from " + userSummary.first_name + " " + userSummary.last_name);
-        m.setBody("Your friend " + userSummary.first_name + " " + userSummary.last_name + "is inviting you to join our app, SocialAwesome!");
+        m.setBody("Your friend " + userSummary.first_name + " " + userSummary.last_name + " is inviting you to join our app, SocialAwesome!");
         try {
             if (m.send()) {
-                Toast.makeText(context, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, "Email was sent successfully.", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(context, "Email was not sent.", Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, "Email was not sent.", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(context, "There was a problem sending the email.", Toast.LENGTH_LONG).show();
+//            Toast.makeText(context, "There was a problem sending the email.", Toast.LENGTH_LONG).show();
             Log.e("MailApp", "Could not send email", e);
         }
     }

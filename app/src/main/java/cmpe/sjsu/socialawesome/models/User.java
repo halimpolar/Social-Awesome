@@ -25,7 +25,7 @@ public class User {
     public String location;
     public String profession;
     public String aboutMe;
-    public String intestes;
+    public String interests;
     public String token;
 
     // 0 -- disable

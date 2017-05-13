@@ -12,24 +12,24 @@
 
         <Button
             android:id="@+id/add_friend_btn"
-            android:layout_width="300dp"
-            android:layout_height="60dp"
+            android:layout_width="250dp"
+            android:layout_height="35dp"
             android:text="Add Friend"
-            android:textSize="20sp" />
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/outgoing_friend_request_btn"
-            android:layout_width="300dp"
-            android:layout_height="60dp"
+            android:layout_width="250dp"
+            android:layout_height="35dp"
             android:text="Outgoing Friend Request"
-            android:textSize="20sp" />
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/friend_request_btn"
-            android:layout_width="300dp"
-            android:layout_height="60dp"
+            android:layout_width="250dp"
+            android:layout_height="35dp"
             android:text="Friend Request"
-            android:textSize="20sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -37,7 +37,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/cardList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </LinearLayout>

@@ -19,6 +19,6 @@ public class SocialInstanceIDService extends FirebaseInstanceIdService {
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "new Token is: " + token);
 
-        UserAuth.getInstance().getCurrentUser().token = token;
+//        UserAuth.getInstance().getCurrentUser().token = token;
     }
 }
