@@ -29,6 +29,9 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main" />
+        <activity
+            android:name=".PrivateMessageActivity"
+            android:label="@string/title_activity_main" />
 
         <service android:name=".services.SocialMessageService">
             <intent-filter>

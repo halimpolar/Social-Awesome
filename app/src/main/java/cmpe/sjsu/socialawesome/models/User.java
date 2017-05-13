@@ -49,4 +49,6 @@ public class User {
     // List of friends that sent invitation to this user
     public Map<String, UserSummary> pendingFriends;
 
+    public Map<String, PrivateMessage> privateMessage;
+
 }

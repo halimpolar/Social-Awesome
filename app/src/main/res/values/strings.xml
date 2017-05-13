@@ -24,6 +24,8 @@
     <string name="friends">Friends</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
+    <string name="hint_write_message">Write message here</string>
+    <string name="send">Send</string>
 
     <!--Toast message-->
     <string name="success_send_push">Push notification sent</string>

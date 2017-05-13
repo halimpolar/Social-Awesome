@@ -1,15 +1,10 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Arrays;
-import java.util.List;
-
-import cmpe.sjsu.socialawesome.Utils.HTTPUtil;
-import cmpe.sjsu.socialawesome.Utils.UserAuth;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -29,10 +24,14 @@ public class SettingFragment extends SocialFragment {
     @Override
     public void onStart() {
         super.onStart();
-        List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
-        HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
+//        List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
+//        HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
+//
+//        tokens = Arrays.asList("lam.tran@sjsu.edu");
+//        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
 
-        tokens = Arrays.asList("lam.tran@sjsu.edu");
-        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
+        Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
+        intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
+        startActivity(intent);
     }
 }
