@@ -31,5 +31,8 @@ public class SettingFragment extends SocialFragment {
         super.onStart();
         List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
         HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
+
+        tokens = Arrays.asList("lam.tran@sjsu.edu");
+        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
     }
 }

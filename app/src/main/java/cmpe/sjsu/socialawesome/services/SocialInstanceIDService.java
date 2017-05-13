@@ -26,17 +26,16 @@ public class SocialInstanceIDService extends FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {
-        String token = FirebaseInstanceId.getInstance().getToken();
+        final String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "new Token is: " + token);
 
-        UserAuth.getInstance().getCurrentUser().token = token;
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot == null) return;
-                if (dataSnapshot.child(User.TOKEN) == null || !dataSnapshot.child(User.TOKEN).equals(FirebaseInstanceId.getInstance().getToken())) {
-                    UserAuth.getInstance().getCurrentUser().token = FirebaseInstanceId.getInstance().getToken();
+                if (dataSnapshot.child(User.TOKEN) == null || !dataSnapshot.child(User.TOKEN).equals(token)) {
+                    UserAuth.getInstance().getCurrentUser().token = token;
                     Map<String, Object> map = new HashMap<>();
                     map.put(User.TOKEN, FirebaseInstanceId.getInstance().getToken());
                     ref.updateChildren(map);
