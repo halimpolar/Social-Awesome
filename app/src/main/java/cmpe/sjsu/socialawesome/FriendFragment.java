@@ -1,6 +1,7 @@
 package cmpe.sjsu.socialawesome;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,12 +42,20 @@ public class FriendFragment extends SocialFragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_friend, container, false);
-        recList = (RecyclerView) v.findViewById(R.id.cardList);
-        recList.setHasFixedSize(true);
+
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        recList = (RecyclerView) view.findViewById(R.id.cardList);
+        recList.setHasFixedSize(false);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
-        return inflater.inflate(R.layout.fragment_friend, container, false);
+        mAdapter = new FriendListAdapter(mFriendList);
+        recList.setAdapter(mAdapter);
     }
 
     @Override
@@ -64,7 +73,7 @@ public class FriendFragment extends SocialFragment {
                     UserSummary userSummary = postSnapshot.getValue(UserSummary.class);
 //                UserSummary userSummary = getUserSummary(user);
                     mFriendList.add(userSummary);
-
+                    mAdapter.notifyDataSetChanged();
 //                    addFriendList(userSummary);
 
                 }
@@ -109,10 +118,10 @@ public class FriendFragment extends SocialFragment {
 //            }
 //        });
 //        mFriendList.add(UserAuth.getCurrentUserSummary());
-      //TODO: working card, https://developer.android.com/training/material/lists-cards.html#Dependencies
     }
 
     private static void addFriendList(UserSummary userSummary) {
+        mFriendList.add(userSummary);
     }
 
     private static UserSummary getUserSummary(User user) {
