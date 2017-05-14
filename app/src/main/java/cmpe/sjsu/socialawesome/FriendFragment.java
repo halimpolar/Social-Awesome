@@ -60,9 +60,16 @@ public class FriendFragment extends SocialFragment {
         friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                UserSummary userSummary = getUserSummary(user);
-                addFriendList(userSummary);
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    UserSummary userSummary = postSnapshot.getValue(UserSummary.class);
+//                UserSummary userSummary = getUserSummary(user);
+                    mFriendList.add(userSummary);
+
+//                    addFriendList(userSummary);
+
+                }
+                mAdapter = new FriendListAdapter(mFriendList);
+                recList.setAdapter(mAdapter);
             }
 
             @Override
@@ -102,12 +109,10 @@ public class FriendFragment extends SocialFragment {
 //            }
 //        });
 //        mFriendList.add(UserAuth.getCurrentUserSummary());
-        mAdapter = new FriendListAdapter(mFriendList);
-        recList.setAdapter(mAdapter);
+      //TODO: working card, https://developer.android.com/training/material/lists-cards.html#Dependencies
     }
 
     private static void addFriendList(UserSummary userSummary) {
-        mFriendList.add(userSummary);
     }
 
     private static UserSummary getUserSummary(User user) {

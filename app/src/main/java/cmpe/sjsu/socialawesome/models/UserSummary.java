@@ -12,7 +12,7 @@ public class UserSummary {
     public String first_name;
     public String last_name;
     public String profilePhotoURL;
-    public int status;
+    public int status; //this
     public String nick_name;
     public String location;
     public String profession;
