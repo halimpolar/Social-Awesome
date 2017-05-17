@@ -31,7 +31,6 @@ public class TimeLineFragment extends SocialFragment {
         View view =  inflater.inflate(R.layout.fragment_timeline, container, false);
 
         mTimelineListView = (RecyclerView) view.findViewById(R.id.timelineListView);
-        mTimelineListView.setHasFixedSize(true);
         mAddNewPostBtnView = (FloatingActionButton) view.findViewById(R.id.addNewPostBtn);
 
         return view;
