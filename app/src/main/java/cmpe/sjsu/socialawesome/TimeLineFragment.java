@@ -2,6 +2,7 @@ package cmpe.sjsu.socialawesome;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,5 +49,18 @@ public class TimeLineFragment extends SocialFragment {
         test[2] = "Sterling T";
         mAdapter = new TimeLineAdapter(test);
         mTimelineListView.setAdapter(mAdapter);
+
+        mAddNewPostBtnView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), CreatePostActivity.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
