@@ -7,8 +7,9 @@ import com.google.firebase.database.IgnoreExtraProperties;
  */
 @IgnoreExtraProperties
 public class Post {
-    public String id;
-    public String post;
-    public String photoURL;
+    public String authorName;
+    public String profilePic;
+    public String contentPost;
+    public String contentPhotoURL;
 
 }
