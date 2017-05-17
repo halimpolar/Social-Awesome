@@ -1,10 +1,12 @@
 package cmpe.sjsu.socialawesome.adapters;
 
+import android.media.Image;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,13 +16,19 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
     private String[] mDataset;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView name;
+        public TextView authorName;
+        public ImageView profilePic;
+        public TextView postContent;
+        public ImageView postPic;
         public CardView card;
 
         public ViewHolder(View cardView) {
             super(cardView);
             card = (CardView)cardView.findViewById(R.id.card_view);
-            name = (TextView)cardView.findViewById(R.id.timeline_name);
+            authorName = (TextView)cardView.findViewById(R.id.timeline_name);
+            profilePic = (ImageView)cardView.findViewById(R.id.timeline_pic);
+            postContent = (TextView) cardView.findViewById(R.id.timeline_content);
+            postPic = (ImageView)cardView.findViewById(R.id.timeline_attachment);
         }
     }
 
@@ -40,7 +48,7 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.name.setText(mDataset[position]);
+        holder.authorName.setText(mDataset[position]);
     }
 
     @Override

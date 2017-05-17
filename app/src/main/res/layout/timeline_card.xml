@@ -33,11 +33,18 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/timeline_post"
+                android:id="@+id/timeline_content"
                 android:text="Hi my name is Sterling asdads adsasd asd asda sadaads ads asd asda d"
                 android:layout_below="@id/timeline_name"
-                android:layout_marginLeft="8dp"
+                android:layout_alignLeft="@id/timeline_name"
                 android:layout_toRightOf="@id/timeline_pic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/timeline_attachment"
+                android:layout_below="@id/timeline_content"
+                android:layout_alignLeft="@id/timeline_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
