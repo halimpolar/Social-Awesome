@@ -29,6 +29,10 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main" />
 
+        <activity
+            android:name=".CreatePostActivity"
+            android:label="@string/title_activity_post" />
+
         <service android:name=".push_notification.SocialMessageService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

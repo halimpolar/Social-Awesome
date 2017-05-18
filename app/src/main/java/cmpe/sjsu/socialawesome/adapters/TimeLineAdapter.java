@@ -1,6 +1,5 @@
 package cmpe.sjsu.socialawesome.adapters;
 
-import android.media.Image;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,10 +9,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import cmpe.sjsu.socialawesome.R;
+import cmpe.sjsu.socialawesome.models.Post;
 
 public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHolder> {
-    private String[] mDataset;
+    private ArrayList<Post> posts;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView authorName;
@@ -32,8 +34,8 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
         }
     }
 
-    public TimeLineAdapter(String[] dataset) {
-        mDataset = dataset;
+    public TimeLineAdapter(ArrayList<Post> posts) {
+        this.posts = posts;
     }
 
     @Override
@@ -48,11 +50,12 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.authorName.setText(mDataset[position]);
+        holder.authorName.setText(posts.get(position).getAuthorName());
+        holder.postContent.setText(posts.get(position).getAuthorName());
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return posts.size();
     }
 }

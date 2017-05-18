@@ -1,7 +1,5 @@
 package cmpe.sjsu.socialawesome;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,11 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
+import java.util.ArrayList;
 
-/**
- * A placeholder fragment containing a simple view.
- */
+import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
+import cmpe.sjsu.socialawesome.models.Post;
+
 public class TimeLineFragment extends SocialFragment {
     private RecyclerView mTimelineListView;
     private FloatingActionButton mAddNewPostBtnView;
@@ -43,11 +41,9 @@ public class TimeLineFragment extends SocialFragment {
 
         mLayoutManager = new LinearLayoutManager(getContext());
         mTimelineListView.setLayoutManager(mLayoutManager);
-        String[] test = new String[3];
-        test[0] = "TEST 1";
-        test[1] = "Test2";
-        test[2] = "Sterling T";
-        mAdapter = new TimeLineAdapter(test);
+        ArrayList<Post> post = new ArrayList<>();
+        post.add(new Post("Sterling Tarng", "This is my name and this is my game.", null, null));
+        mAdapter = new TimeLineAdapter(post);
         mTimelineListView.setAdapter(mAdapter);
 
         mAddNewPostBtnView.setOnClickListener(new View.OnClickListener() {
