@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private List<String> mDrawerListTitles = new ArrayList<>();
     private ActionBarDrawerToggle mDrawerToggle;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     private SocialFragment mCurrentFragment;
 
@@ -36,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerListTitles.add(getString(R.string.profile));
         mDrawerListTitles.add(getString(R.string.friends));
         mDrawerListTitles.add(getString(R.string.setting));
+        mDrawerListTitles.add(getString(R.string.signout));
 
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
@@ -67,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
                         //Setting
                         title = getString(R.string.setting);
                         fragment = new SettingFragment();
+                        break;
+                    case 4:
+                        //Sign Out
+                        title = getString(R.string.signout);
                         break;
                     default:
                         break;
@@ -136,5 +146,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }

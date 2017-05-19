@@ -48,9 +48,21 @@
         android:layout_height="wrap_content"
         android:text="@string/login" />
 
-    <TextView
-        android:id="@+id/create_account_text"
+    <Button
+        android:id="@+id/create_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_account_text" />
+        android:text="Sign Up" />
+
+    <Button
+        android:id="@+id/verify_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Verify Account" />
+
+    <Button
+        android:id="@+id/resend_verification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resend Verification Email" />
 </LinearLayout>
