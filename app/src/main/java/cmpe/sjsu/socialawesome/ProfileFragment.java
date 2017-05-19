@@ -103,7 +103,7 @@ public class ProfileFragment extends SocialFragment {
         setEditText(mFirstNameEt, user.first_name);
         setEditText(mProfessionEt, user.profession);
         setEditText(mAboutEt, user.aboutMe);
-        setEditText(mInterestEt, user.intestes);
+        setEditText(mInterestEt, user.interests);
     }
 
     private void setEditText(EditText et, String st) {
