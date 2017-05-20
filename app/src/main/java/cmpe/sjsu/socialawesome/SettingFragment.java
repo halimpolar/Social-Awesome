@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import cmpe.sjsu.socialawesome.models.UserSummary;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -32,6 +34,11 @@ public class SettingFragment extends SocialFragment {
 
         Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
         intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
+        UserSummary summary = new UserSummary();
+        summary.email = "bing.shi@sjsu.edu";
+        summary.id = "PKdgrGvdxNbVYCARQiJ20BguafV2";
+
+        intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, summary);
         startActivity(intent);
     }
 }

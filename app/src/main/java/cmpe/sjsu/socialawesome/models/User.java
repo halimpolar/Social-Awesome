@@ -10,6 +10,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class User {
     public static final String TOKEN = "token";
+    public static final String PRIVATE_MESSAGE = "privateMessage";
     public static final String FRIEND_LIST = "friends";
     public static final String WAITING_FRIEND_LIST = "waitingFriends";
     public static final String FOLOWING_FRIEND_LIST = "followingFriends";
