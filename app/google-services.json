@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "502561435056-k1ffo8l1847ubgivr2t7biloaul1fcpu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cmpe.sjsu.socialawesome",
+            "certificate_hash": "d182a978bb0165e8a6764fdea2c8046feb0a9179"
+          }
+        },
+        {
+          "client_id": "502561435056-1r6ebgj7pejbin1t5o4eu99vvobq3gpu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cmpe.sjsu.socialawesome",
+            "certificate_hash": "aecec5d6ff993564a59671261aec83b72dc9bdd4"
+          }
+        },
+        {
           "client_id": "502561435056-jfijjbs35i314njuhdlbji67qecdudt8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +45,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "502561435056-jfijjbs35i314njuhdlbji67qecdudt8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
