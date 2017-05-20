@@ -61,47 +61,10 @@ public class ProfileFragment extends SocialFragment {
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
         mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
         //mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-
-        mUpdateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String userid = mFirebaseDatabase.getKey();
-                String first_name = mFirstNameEt.getText().toString();
-                String last_name = mLastNameEt.getText().toString();
-                mFirebaseDatabase.child(userid).child("first_name").setValue(first_name);
-                mFirebaseDatabase.child(userid).child("last_name").setValue(last_name);
-                //updateUser(first_name, last_name);
-
-            }
-
-        });
-        return view;
-    }
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
 
 
-
-    private void updateUser(String first_name, String last_name) {
-        mFirebaseDatabase.child(userId).child("first_name").setValue(first_name);
-        mFirebaseDatabase.child(userId).child("last_name").setValue(last_name);
-
-    }
-
-
-
-/*    @Override
-    public void onStart() {
-        super.onStart();
-        populateInfo();
-
-    }
-
-    private void populateInfo() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
-        pd = new ProgressDialog(getContext());
-        pd.show();
-
-        ref.runTransaction(new Transaction.Handler() {
+        mFirebaseDatabase.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
 
@@ -121,9 +84,32 @@ public class ProfileFragment extends SocialFragment {
             @Override
             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                 Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-                pd.hide();
             }
         });
+
+        mUpdateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String first_name = mFirstNameEt.getText().toString();
+                String last_name = mLastNameEt.getText().toString();
+                String nickname = mNicknameEt.getText().toString();
+                String email = mEmailEt.getText().toString();
+                String location = mLocationEt.getText().toString();
+                String profession = mProfessionEt.getText().toString();
+                String about_me = mAboutEt.getText().toString();
+                String interest = mInterestEt.getText().toString();
+
+                mFirebaseDatabase.child("first_name").setValue(first_name);
+                mFirebaseDatabase.child("last_name").setValue(last_name);
+                mFirebaseDatabase.child("email").setValue(email);
+                mFirebaseDatabase.child("nickname").setValue(nickname);
+                mFirebaseDatabase.child("location").setValue(location);
+                mFirebaseDatabase.child("profession").setValue(profession);
+                mFirebaseDatabase.child("about_me").setValue(about_me);
+                mFirebaseDatabase.child("interest").setValue(interest);
+            }
+        });
+        return view;
     }
 
     private void populateInfoIntoEditText(User user) {
@@ -142,5 +128,5 @@ public class ProfileFragment extends SocialFragment {
             et.setText(st);
         }
     }
-    */
+
 }

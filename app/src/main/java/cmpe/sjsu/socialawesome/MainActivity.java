@@ -1,6 +1,8 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     case 4:
                         //Sign Out
                         title = getString(R.string.signout);
+                        signout();
                         break;
                     default:
                         break;
@@ -145,5 +150,12 @@ public class MainActivity extends AppCompatActivity {
         // Handle your other action bar items...
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void signout() {
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+            FirebaseAuth.getInstance().signOut();
+        }
     }
 }
