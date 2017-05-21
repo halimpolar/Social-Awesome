@@ -32,8 +32,8 @@ public class SettingFragment extends SocialFragment {
 //        tokens = Arrays.asList("lam.tran@sjsu.edu");
 //        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
 
-        Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
-        intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_LIST);
+        Intent intent = new Intent(getActivity(), InMailActivity.class);
+        intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_DETAIL);
 //        UserSummary summary = new UserSummary();
 //        summary.email = "lamtran91@gmail.com";
 //        summary.id = "nEKXWvqoroRjtFqLd9c3Z3ZF3Bi2";

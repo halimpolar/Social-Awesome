@@ -11,6 +11,7 @@ import java.util.Map;
 public class User {
     public static final String TOKEN = "token";
     public static final String PRIVATE_MESSAGE = "privateMessage";
+    public static final String IN_MAIL = "inMail";
     public static final String FRIEND_LIST = "friends";
     public static final String WAITING_FRIEND_LIST = "waitingFriends";
     public static final String FOLOWING_FRIEND_LIST = "followingFriends";
@@ -51,4 +52,5 @@ public class User {
     public Map<String, UserSummary> pendingFriends;
 
     public Map<String, PrivateMessage> privateMessage;
+    public Map<String, InMailMessage> inMail;
 }
