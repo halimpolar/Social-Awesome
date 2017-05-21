@@ -38,7 +38,7 @@ public class PrivateMessageChatFragment extends SocialFragment {
     final DatabaseReference mSelfRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
             .child(UserAuth.getInstance().getCurrentUser().id).child(User.PRIVATE_MESSAGE);
     DatabaseReference mOtherRef;
-
+    private boolean isMessageReady;
     private RecyclerView mListView;
     private EditText mEditText;
     private Button mSendButton;
@@ -70,7 +70,7 @@ public class PrivateMessageChatFragment extends SocialFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mSendButton.setEnabled(s.length() > 0);
+                mSendButton.setEnabled(s.length() > 0 && isMessageReady);
             }
 
             @Override
@@ -104,22 +104,24 @@ public class PrivateMessageChatFragment extends SocialFragment {
 
     private void loadChat() {
 
-        mSelfRef.child(mOtherUser.id).addListenerForSingleValueEvent(new ValueEventListener() {
+        mSelfRef.child(mOtherUser.id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
-                    return;
+                if (dataSnapshot.getChildren() == null) {
+                    mSelfRef.child(mOtherUser.id).setValue(mOtherUser);
+                    if (mOtherRef != null)
+                        mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserSummary());
                 }
 
-                mSelfRef.push().setValue(mOtherRef);
-                if (mOtherRef != null)
-                    mOtherRef.push().setValue(UserAuth.getCurrentUserSummary());
-
-                for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                messages.clear();
+                for (DataSnapshot messageSnapshot : dataSnapshot.child(PrivateMessage.MESSAGES).getChildren()) {
                     SingleMessage message = messageSnapshot.getValue(SingleMessage.class);
                     messages.add(message);
-                    mAdapter.notifyDataSetChanged();
                 }
+                mAdapter.notifyDataSetChanged();
+                mListView.scrollToPosition(messages.size() - 1);
+                isMessageReady = true;
+
             }
 
             @Override
@@ -136,8 +138,6 @@ public class PrivateMessageChatFragment extends SocialFragment {
         SingleMessage newMessage = new SingleMessage(message, true);
         mSelfRef.child(mOtherUser.id).child(PrivateMessage.MESSAGES).push().setValue(newMessage);
         if (mOtherRef != null)
-            mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).child(PrivateMessage.MESSAGES).push().setValue(newMessage);
-        messages.add(newMessage);
-        mAdapter.notifyDataSetChanged();
+            mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).child(PrivateMessage.MESSAGES).push().setValue(new SingleMessage(message, false));
     }
 }

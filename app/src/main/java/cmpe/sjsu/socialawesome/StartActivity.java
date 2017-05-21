@@ -204,7 +204,7 @@ public class StartActivity extends AppCompatActivity {
         final String token = FirebaseInstanceId.getInstance().getToken();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         if (fbUser.isEmailVerified()) {
-            if (mIsLogin) {
+            if (!mIsLogin) {
                 User user = new User();
                 user.id = fbUser.getUid();
                 user.email = fbUser.getEmail();
@@ -214,7 +214,7 @@ public class StartActivity extends AppCompatActivity {
 
                 Task task = ref.child(fbUser.getUid()).setValue(user);
 
-                if (task.isSuccessful()) {
+                if (!task.isSuccessful()) {
                     //TODO: show text fail to save user to db
                     Log.e(TAG, "Fail to save user to db");
                 } else {

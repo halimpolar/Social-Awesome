@@ -51,5 +51,4 @@ public class User {
     public Map<String, UserSummary> pendingFriends;
 
     public Map<String, PrivateMessage> privateMessage;
-
 }

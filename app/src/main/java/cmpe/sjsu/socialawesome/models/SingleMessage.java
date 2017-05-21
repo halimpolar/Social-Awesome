@@ -10,6 +10,9 @@ public class SingleMessage {
     public boolean isSelf;
     public String message;
 
+    public SingleMessage() {
+    }
+
     public SingleMessage(String message, boolean isSelf) {
         this.isSelf = isSelf;
         this.message = message;
