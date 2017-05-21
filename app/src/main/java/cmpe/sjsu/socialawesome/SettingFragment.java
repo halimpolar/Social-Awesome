@@ -33,16 +33,16 @@ public class SettingFragment extends SocialFragment {
 //        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
 
         Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
-        intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
+        intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_LIST);
 //        UserSummary summary = new UserSummary();
 //        summary.email = "lamtran91@gmail.com";
 //        summary.id = "nEKXWvqoroRjtFqLd9c3Z3ZF3Bi2";
 
-        UserSummary summary = new UserSummary();
-        summary.email = "lam.tran@sjsu.edu";
-        summary.id = "NavUTJHA91azs7Un6iA69VDf7JX2";
+//        UserSummary summary = new UserSummary();
+//        summary.email = "lam.tran@sjsu.edu";
+//        summary.id = "NavUTJHA91azs7Un6iA69VDf7JX2";
+//        intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, summary);
 
-        intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, summary);
         startActivity(intent);
     }
 }

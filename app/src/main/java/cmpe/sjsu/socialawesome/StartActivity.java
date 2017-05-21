@@ -200,9 +200,9 @@ public class StartActivity extends AppCompatActivity {
         return valid;
     }
 
-    private void successLogin(FirebaseUser fbUser) {
+    private void successLogin(final FirebaseUser fbUser) {
         final String token = FirebaseInstanceId.getInstance().getToken();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         if (fbUser.isEmailVerified()) {
             if (!mIsLogin) {
                 User user = new User();
@@ -222,7 +222,6 @@ public class StartActivity extends AppCompatActivity {
                     launchMainActivity();
                     Log.d(TAG, "Successfully create user in db");
                 }
-
             } else {
                 ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
                     @Override
@@ -232,6 +231,7 @@ public class StartActivity extends AppCompatActivity {
 
                             if (token != null && !token.equals(user.token)) {
                                 user.token = token;
+                                ref.child(fbUser.getUid()).child("token").setValue(token);
                             }
 
                             UserAuth.getInstance().setCurrentUser(user);

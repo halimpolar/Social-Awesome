@@ -103,7 +103,6 @@ public class PrivateMessageChatFragment extends SocialFragment {
     }
 
     private void loadChat() {
-
         mSelfRef.child(mOtherUser.id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -111,6 +110,10 @@ public class PrivateMessageChatFragment extends SocialFragment {
                     mSelfRef.child(mOtherUser.id).setValue(mOtherUser);
                     if (mOtherRef != null)
                         mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserSummary());
+                } else {
+                    mSelfRef.child(mOtherUser.id).updateChildren(mOtherUser.toMap());
+                    if (mOtherRef != null)
+                        mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).updateChildren(UserAuth.getCurrentUserSummary().toMap());
                 }
 
                 messages.clear();
@@ -128,10 +131,6 @@ public class PrivateMessageChatFragment extends SocialFragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-    }
-
-    private void populateMessageList() {
-
     }
 
     private void addNewChat(String message) {
