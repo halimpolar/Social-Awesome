@@ -17,9 +17,11 @@ import cmpe.sjsu.socialawesome.models.UserSummary;
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder> {
     private List<UserSummary> mUsers;
+    private OnMessageChatClickListener mListener;
 
-    public MessageListAdapter(List<UserSummary> summaries) {
+    public MessageListAdapter(List<UserSummary> summaries, OnMessageChatClickListener listener) {
         mUsers = summaries;
+        mListener = listener;
     }
 
     @Override
@@ -30,8 +32,16 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        UserSummary user = mUsers.get(position);
+        final UserSummary user = mUsers.get(position);
         holder.mUserName.setText(user.email);
+        holder.mRootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onClicked(user);
+                }
+            }
+        });
     }
 
     @Override
@@ -39,12 +49,18 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return mUsers.size();
     }
 
+    interface OnMessageChatClickListener {
+        void onClicked(UserSummary user);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView mUserImage;
         public TextView mUserName;
+        public View mRootView;
 
         public ViewHolder(View view) {
             super(view);
+            mRootView = view;
             mUserImage = (ImageView) view.findViewById(R.id.userImage);
             mUserName = (TextView) view.findViewById(R.id.userName);
         }

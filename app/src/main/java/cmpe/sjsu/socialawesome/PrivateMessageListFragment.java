@@ -1,5 +1,6 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +27,6 @@ import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 /**
  * Created by lam on 4/28/17.
  */
-
 public class PrivateMessageListFragment extends SocialFragment {
     final DatabaseReference mSelfRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
             .child(UserAuth.getInstance().getCurrentUser().id).child(User.PRIVATE_MESSAGE);
@@ -49,7 +49,15 @@ public class PrivateMessageListFragment extends SocialFragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         mListView.setLayoutManager(llm);
 
-        mAdapter = new MessageListAdapter(mSummaryList);
+        mAdapter = new MessageListAdapter(mSummaryList, new MessageListAdapter.OnMessageChatClickListener() {
+            @Override
+            public void onClicked(UserSummary user) {
+                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
+                intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
+                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, user);
+                startActivity(intent);
+            }
+        });
         mListView.setAdapter(mAdapter);
     }
 
