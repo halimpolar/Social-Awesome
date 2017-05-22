@@ -9,10 +9,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 import cmpe.sjsu.socialawesome.R;
+import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.Post;
+import cmpe.sjsu.socialawesome.models.User;
 
 public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHolder> {
     private ArrayList<Post> posts;
@@ -51,11 +55,25 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.authorName.setText(posts.get(position).getAuthorName());
-        holder.postContent.setText(posts.get(position).getAuthorName());
+        holder.postContent.setText(posts.get(position).getContentPost());
+
+        User currentUser = UserAuth.getInstance().getCurrentUser();
+        if (currentUser.profilePhotoURL != null) {
+            Picasso.with(holder.profilePic.getContext()).load(currentUser.profilePhotoURL).into(holder.profilePic);
+        } else {
+            String defaultURL = holder.profilePic.getContext().getResources().getString(R.string.default_profile_pic);
+            Picasso.with(holder.profilePic.getContext()).load(defaultURL).into(holder.profilePic);
+        }
+
     }
 
     @Override
     public int getItemCount() {
         return posts.size();
+    }
+
+    public void addNewPost(Post post) {
+        posts.add(0, post);
+        notifyDataSetChanged();
     }
 }

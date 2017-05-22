@@ -25,4 +25,6 @@
     <string name="friends">Friends</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
+
+    <string name="default_profile_pic">https://thumb10.shutterstock.com/display_pic_with_logo/1737244/149293433/stock-photo-anonymous-male-profile-picture-silhouette-profile-avatar-149293433.jpg</string>
 </resources>

@@ -19,10 +19,6 @@ import static cmpe.sjsu.socialawesome.models.User.FOLOWING_FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.PENDING_FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
 
-/**
- * Created by bing on 5/11/17.
- */
-
 public class FriendUtils {
 
     public static void addFriendbyEmail(Context context, String email) {
