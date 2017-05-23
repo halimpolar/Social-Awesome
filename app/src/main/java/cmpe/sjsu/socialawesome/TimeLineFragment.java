@@ -17,8 +17,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
@@ -33,13 +37,13 @@ public class TimeLineFragment extends SocialFragment {
     private TimeLineAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Post> postList;
+    private DatabaseReference currentUserRef;
+    private ProgressDialog progress;
 
     public static int CREATE_POST = 21;
     public static int RESULT_OK = 1;
     public static String POST_CONTENT_KEY = "postContentKey";
-    public static String POST_KEY = "posts";
-
-    private ProgressDialog pd;
+    public static String FIREBASE_POST_KEY = "posts";
 
     public TimeLineFragment() {
         mTitle = TimeLineFragment.class.getSimpleName();
@@ -60,13 +64,13 @@ public class TimeLineFragment extends SocialFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        progress = new ProgressDialog(getContext());
+        progress.show();
+        DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
+        currentUserRef = userTableRef.child(UserAuth.getInstance().getCurrentUser().id);
         mLayoutManager = new LinearLayoutManager(getContext());
         mTimelineListView.setLayoutManager(mLayoutManager);
-        postList = new ArrayList<>();
-        postList.add(new Post(UserAuth.getInstance().getCurrentUser(), "This is the very first post.", null));
-        postList.add(new Post(UserAuth.getInstance().getCurrentUser(), "This is the most recent post.", null));
-        mAdapter = new TimeLineAdapter(postList);
-        mTimelineListView.setAdapter(mAdapter);
+        initPostListFromServer();
 
         mAddNewPostBtnView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,8 +79,6 @@ public class TimeLineFragment extends SocialFragment {
                 startActivityForResult(intent, CREATE_POST);
             }
         });
-
-        populateInfo();
     }
 
     @Override
@@ -91,38 +93,33 @@ public class TimeLineFragment extends SocialFragment {
     }
 
     private void addPostToServer(Post post) {
-        final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        final DatabaseReference currentUserRef = userTableRef.child(UserAuth.getInstance().getCurrentUser().id);
-
-        //currentUserRef.setValue();
+        String key = currentUserRef.child(FIREBASE_POST_KEY).push().getKey();
+        Map<String, Object> postValues = post.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/" + FIREBASE_POST_KEY + "/" + key, postValues);
+        currentUserRef.updateChildren(childUpdates);
     }
 
-    private void populateInfo() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
-        pd = new ProgressDialog(getContext());
-        pd.show();
-
-        ref.runTransaction(new Transaction.Handler() {
+    private void initPostListFromServer() {
+        currentUserRef.child(FIREBASE_POST_KEY).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-
-                final User user = mutableData.getValue(User.class);
-                if (user != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //populateInfoIntoEditText(user);
-                        }
-                    });
-
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                postList = new ArrayList<>();
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    HashMap postMap = (HashMap)postSnapshot.getValue();
+                    Post post = new Post(postSnapshot.child("user").getValue(User.class),
+                            (String)postMap.get("contentPost"), (String)postMap.get("contentPostURL"));
+                    postList.add(post);
                 }
-                return Transaction.success(mutableData);
+                Collections.sort(postList);
+                mAdapter = new TimeLineAdapter(postList);
+                mTimelineListView.setAdapter(mAdapter);
+                progress.hide();
             }
 
             @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                //Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-                pd.hide();
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

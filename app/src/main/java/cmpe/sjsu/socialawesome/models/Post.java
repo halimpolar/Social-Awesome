@@ -1,25 +1,41 @@
 package cmpe.sjsu.socialawesome.models;
 
+import android.support.annotation.NonNull;
+
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lam on 4/27/17.
  */
 @IgnoreExtraProperties
-public class Post {
+public class Post implements Comparable<Post>{
     public User user;
     public String contentPost;
     public String contentPhotoURL;
-    public Date timestamp;
+    public long timestamp;
 
     public Post(User user, String contentPost, String contentPhotoURL) {
         this.user = user;
         this.contentPost = contentPost;
         this.contentPhotoURL = contentPhotoURL;
-        this.timestamp = Calendar.getInstance().getTime();
+        this.timestamp = Calendar.getInstance().getTime().getTime();
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("user", user);
+        result.put("contentPost", contentPost);
+        result.put("contentPhotoURL", contentPhotoURL);
+        result.put("timestamp", timestamp);
+
+        return result;
     }
 
     public User getUser() {
@@ -36,5 +52,14 @@ public class Post {
 
     public String getContentPhotoURL() {
         return contentPhotoURL;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public int compareTo(@NonNull Post post) {
+        return (int)(post.getTimestamp() - timestamp);
     }
 }
