@@ -23,8 +23,8 @@ public class User {
     public String profilePhotoURL;
     public String location;
     public String profession;
-    public String aboutMe;
-    public String interests;
+    public String about_me;
+    public String interest;
     public String token;
 
     // 0 -- disable
