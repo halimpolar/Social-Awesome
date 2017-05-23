@@ -36,9 +36,9 @@ public class ProfileFragment extends SocialFragment {
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
     private Button mUpdateBtn;
+    private Button mEditBtn;
     private Button mCancelBtn;
     private DatabaseReference mFirebaseDatabase;
-    //private FirebaseDatabase mFirebaseInstance;
     String userId;
 
     public ProfileFragment() {
@@ -48,6 +48,7 @@ public class ProfileFragment extends SocialFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         View view = inflater.inflate(R.layout.profile_fragment, container, false);
         mNicknameEt = (EditText) view.findViewById(R.id.nickname);
@@ -60,6 +61,7 @@ public class ProfileFragment extends SocialFragment {
         mInterestEt = (EditText) view.findViewById(R.id.interests);
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
         mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
+        mEditBtn = (Button) view.findViewById(R.id.edit_btn);
         //mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
 
@@ -92,35 +94,46 @@ public class ProfileFragment extends SocialFragment {
             public void onClick(View view) {
                 String first_name = mFirstNameEt.getText().toString();
                 String last_name = mLastNameEt.getText().toString();
-                String nickname = mNicknameEt.getText().toString();
                 String email = mEmailEt.getText().toString();
+                /*String nickname = mNicknameEt.getText().toString();
                 String location = mLocationEt.getText().toString();
                 String profession = mProfessionEt.getText().toString();
                 String about_me = mAboutEt.getText().toString();
-                String interest = mInterestEt.getText().toString();
+                String interest = mInterestEt.getText().toString();*/
 
                 mFirebaseDatabase.child("first_name").setValue(first_name);
                 mFirebaseDatabase.child("last_name").setValue(last_name);
                 mFirebaseDatabase.child("email").setValue(email);
-                mFirebaseDatabase.child("nickname").setValue(nickname);
+                /*mFirebaseDatabase.child("nickname").setValue(nickname);
                 mFirebaseDatabase.child("location").setValue(location);
                 mFirebaseDatabase.child("profession").setValue(profession);
                 mFirebaseDatabase.child("about_me").setValue(about_me);
-                mFirebaseDatabase.child("interest").setValue(interest);
+                mFirebaseDatabase.child("interest").setValue(interest);*/
             }
         });
         return view;
     }
 
+ /*       mCancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mFirebaseDatabase.child("first_name")
+            }
+
+        });
+        return view;
+    }
+*/
+
     private void populateInfoIntoEditText(User user) {
-        setEditText(mNicknameEt, user.nickname);
+        setEditText(mFirstNameEt, user.first_name);
         setEditText(mLastNameEt, user.last_name);
         setEditText(mEmailEt, user.email);
-        setEditText(mLocationEt, user.location);
-        setEditText(mFirstNameEt, user.first_name);
+        /*setEditText(mLocationEt, user.location);
+        setEditText(mNicknameEt, user.nickname);
         setEditText(mProfessionEt, user.profession);
         setEditText(mAboutEt, user.aboutMe);
-        setEditText(mInterestEt, user.interests);
+        setEditText(mInterestEt, user.interests);*/
     }
 
     private void setEditText(EditText et, String st) {
@@ -129,4 +142,7 @@ public class ProfileFragment extends SocialFragment {
         }
     }
 
+    private void profileDisplay(User user) {
+
+    }
 }
