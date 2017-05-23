@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,8 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
-
-import org.w3c.dom.Text;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import cmpe.sjsu.socialawesome.Utils.TokenBroadcastReceiver;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
@@ -66,7 +64,9 @@ public class StartActivity extends AppCompatActivity {
         mResendVerification = (Button) findViewById(R.id.resend_verification);
         //Fields
         mEmailEt = (EditText) findViewById(R.id.email);
+        //mEmailEt.setText("sterling.tarng@sjsu.edu");
         mPasswordEt = (EditText) findViewById(R.id.password);
+        //mPasswordEt.setText("Test$123");
         mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);
@@ -94,6 +94,7 @@ public class StartActivity extends AppCompatActivity {
 
         setupUI(true);
     }
+
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!validate()) {
@@ -107,13 +108,13 @@ public class StartActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            //successLogin(mAuth.getCurrentUser());
                             sendEmailVerification();
                             updateUI(user);
-                            register(user);
 
-                            mVerifyAccount.setOnClickListener(new View.OnClickListener(){
+                            mVerifyAccount.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick (View v) {
+                                public void onClick(View v) {
                                     sendEmailVerification();
                                 }
 
@@ -121,10 +122,22 @@ public class StartActivity extends AppCompatActivity {
 
                             mResendVerification.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick (View v) {
+                                public void onClick(View v) {
                                     sendEmailVerification();
                                 }
                             });
+
+                            mSubmitBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (!mIsLogin) {
+                                        createAccount(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
+                                    } else {
+                                        signIn(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
+                                    }
+                                }
+                            });
+
                             setupUI(true);
 
 
@@ -152,14 +165,8 @@ public class StartActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            if(mAuth.getCurrentUser().isEmailVerified()){
-                                launchMainActivity();
-                                setupUI(true);
-                            }
-                            else {
-                                Toast.makeText(StartActivity.this, "Email is not Verified",
-                                        Toast.LENGTH_SHORT).show();
-                            }
+                            successLogin(mAuth.getCurrentUser());
+                            setupUI(true);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -170,10 +177,7 @@ public class StartActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
-
-}
+    }
 
     private boolean validate() {
         //validate that the field is completed
@@ -198,51 +202,27 @@ public class StartActivity extends AppCompatActivity {
         return valid;
     }
 
-    private void register (FirebaseUser fbUser) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        User user = new User();
-        user.id = fbUser.getUid();
-        user.email = fbUser.getEmail();
-        user.first_name = mFirstNameEt.getText().toString();
-        user.last_name = mLastNameEt.getText().toString();
-        user.status = 1;
-
-        Task task = ref.child(fbUser.getUid()).setValue(user);
-
-        if (task.isSuccessful()) {
-            //TODO: show text fail to save user to db
-            Log.e(TAG, "Fail to save user to db");
-        } else {
-            UserAuth.getInstance().setCurrentUser(user);
-            Log.d(TAG, "Successfully create user in db");
-            Toast.makeText(StartActivity.this, "Please Verify Your Account",
-                    Toast.LENGTH_SHORT).show();
-
-        }
-    }
-
-    private void successLogin(FirebaseUser fbUser) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        if(fbUser.isEmailVerified()){
-            if (mIsLogin) {
+    private void successLogin(final FirebaseUser fbUser) {
+        final String token = FirebaseInstanceId.getInstance().getToken();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
+        if (fbUser.isEmailVerified()) {
+            if (!mIsLogin) {
                 User user = new User();
                 user.id = fbUser.getUid();
                 user.email = fbUser.getEmail();
                 user.first_name = mFirstNameEt.getText().toString();
                 user.last_name = mLastNameEt.getText().toString();
-                user.status = 1;
+                user.token = token;
 
                 Task task = ref.child(fbUser.getUid()).setValue(user);
 
-                if (task.isSuccessful()) {
+                if (!task.isSuccessful()) {
                     //TODO: show text fail to save user to db
                     Log.e(TAG, "Fail to save user to db");
                 } else {
                     UserAuth.getInstance().setCurrentUser(user);
+                    launchMainActivity();
                     Log.d(TAG, "Successfully create user in db");
-                    Toast.makeText(StartActivity.this, "Please Verify Your Account",
-                            Toast.LENGTH_SHORT).show();
-
                 }
             } else {
                 ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
@@ -250,8 +230,13 @@ public class StartActivity extends AppCompatActivity {
                     public Transaction.Result doTransaction(MutableData mutableData) {
                         User user = mutableData.getValue(User.class);
                         if (user != null) {
+
+                            if (token != null && !token.equals(user.token)) {
+                                user.token = token;
+                                ref.child(fbUser.getUid()).child("token").setValue(token);
+                            }
+
                             UserAuth.getInstance().setCurrentUser(user);
-//                        UserAuth.getInstance().setCurrentUserSummary(user);
                             launchMainActivity();
                         }
                         return Transaction.success(mutableData);
@@ -267,7 +252,6 @@ public class StartActivity extends AppCompatActivity {
             Toast.makeText(StartActivity.this, "Account is not Verified",
                     Toast.LENGTH_SHORT).show();
         }
-
     }
 
     // UI before email is verified
@@ -294,8 +278,8 @@ public class StartActivity extends AppCompatActivity {
         // Disable button
         findViewById(R.id.verify_account).setEnabled(false);
 
-        // Send verification email
-        // [START send_email_verification]
+// Send verification email
+// [START send_email_verification]
         final FirebaseUser user = mAuth.getCurrentUser();
         user.sendEmailVerification()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
