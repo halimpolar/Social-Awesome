@@ -20,11 +20,11 @@ public class Post implements Comparable<Post>{
     public String contentPhotoURL;
     public long timestamp;
 
-    public Post(User user, String contentPost, String contentPhotoURL) {
+    public Post(User user, long timestamp, String contentPost, String contentPhotoURL) {
         this.user = user;
         this.contentPost = contentPost;
         this.contentPhotoURL = contentPhotoURL;
-        this.timestamp = Calendar.getInstance().getTime().getTime();
+        this.timestamp = timestamp;
     }
 
     @Exclude

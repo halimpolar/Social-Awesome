@@ -64,6 +64,9 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
             String defaultURL = holder.profilePic.getContext().getResources().getString(R.string.default_profile_pic);
             Picasso.with(holder.profilePic.getContext()).load(defaultURL).into(holder.profilePic);
         }
+        if (posts.get(position).getContentPhotoURL() != null) {
+            Picasso.with(holder.postPic.getContext()).load(posts.get(position).getContentPhotoURL()).into(holder.postPic);
+        }
 
     }
 

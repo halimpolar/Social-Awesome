@@ -126,6 +126,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
@@ -133,6 +139,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         // Handle your other action bar items...
+        if (item.getItemId() == R.id.refresh) {
+            if (mCurrentFragment != null) {
+                mCurrentFragment.onRefresh();
+            }
+        }
 
         return super.onOptionsItemSelected(item);
     }

@@ -52,7 +52,9 @@ public class StartActivity extends AppCompatActivity {
 
         mSubmitBtn = (Button) findViewById(R.id.submit);
         mEmailEt = (EditText) findViewById(R.id.email);
+        mEmailEt.setText("sterling.tarng@sjsu.edu");
         mPasswordEt = (EditText) findViewById(R.id.password);
+        mPasswordEt.setText("Test$123");
         mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);

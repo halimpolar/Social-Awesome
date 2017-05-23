@@ -20,6 +20,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,7 @@ public class TimeLineFragment extends SocialFragment {
     public static int CREATE_POST = 21;
     public static int RESULT_OK = 1;
     public static String POST_CONTENT_KEY = "postContentKey";
+    public static String POST_CONTENT_URL_KEY = "postContentURLKey";
     public static String FIREBASE_POST_KEY = "posts";
 
     public TimeLineFragment() {
@@ -65,6 +67,7 @@ public class TimeLineFragment extends SocialFragment {
         super.onActivityCreated(savedInstanceState);
 
         progress = new ProgressDialog(getContext());
+        progress.setCancelable(false);
         progress.show();
         DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         currentUserRef = userTableRef.child(UserAuth.getInstance().getCurrentUser().id);
@@ -86,7 +89,10 @@ public class TimeLineFragment extends SocialFragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CREATE_POST && resultCode == RESULT_OK) {
-            Post newPost = new Post(UserAuth.getInstance().getCurrentUser(), data.getStringExtra(POST_CONTENT_KEY), null);
+            String picURL = data.getStringExtra(POST_CONTENT_URL_KEY);
+            Post newPost = new Post(UserAuth.getInstance().getCurrentUser(),
+                    Calendar.getInstance().getTime().getTime(),
+                    data.getStringExtra(POST_CONTENT_KEY), picURL);
             mAdapter.addNewPost(newPost);
             addPostToServer(newPost);
         }
@@ -107,8 +113,8 @@ public class TimeLineFragment extends SocialFragment {
                 postList = new ArrayList<>();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     HashMap postMap = (HashMap)postSnapshot.getValue();
-                    Post post = new Post(postSnapshot.child("user").getValue(User.class),
-                            (String)postMap.get("contentPost"), (String)postMap.get("contentPostURL"));
+                    Post post = new Post(postSnapshot.child("user").getValue(User.class), (long)postMap.get("timestamp"),
+                            (String)postMap.get("contentPost"), (String)postMap.get("contentPhotoURL"));
                     postList.add(post);
                 }
                 Collections.sort(postList);
@@ -122,5 +128,10 @@ public class TimeLineFragment extends SocialFragment {
 
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        initPostListFromServer();
     }
 }
