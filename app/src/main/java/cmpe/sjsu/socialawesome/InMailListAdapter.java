@@ -39,6 +39,8 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
             @Override
             public void execute(User user) {
                 holder.mUserNameEt.setText(user.email);
+                holder.mSubjectEt.setText(message.subject);
+                holder.mTimestampEt.setText(message.lastTimeStamp);
             }
         });
 

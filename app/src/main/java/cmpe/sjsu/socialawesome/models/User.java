@@ -37,19 +37,19 @@ public class User {
     public boolean notification;
 
     // List of friend already establish
-    public Map<String, UserSummary> friends;
+    public Map<String, String> friends;
 
     // List of friend this user sent invitation to
-    public Map<String, UserSummary> waitingFriends;
+    public Map<String, String> waitingFriends;
 
     // List of friend this user sent invitation to
-    public Map<String, UserSummary> followingFriends;
+    public Map<String, String> followingFriends;
 
     // List of person who follow me
-    public Map<String, UserSummary> follower;
+    public Map<String, String> follower;
 
     // List of friends that sent invitation to this user, pending friend request
-    public Map<String, UserSummary> pendingFriends;
+    public Map<String, String> pendingFriends;
 
     public Map<String, PrivateMessage> privateMessage;
     public Map<String, InMailMessage> inMail;
