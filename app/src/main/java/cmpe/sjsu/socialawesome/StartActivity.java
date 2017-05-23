@@ -106,10 +106,14 @@ public class StartActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            //successLogin(mAuth.getCurrentUser());
                             sendEmailVerification();
                             updateUI(user);
+                            successLogin(user);
 
+                            if (user.isEmailVerified()) {
+                                launchMainActivity();
+                            }
+                            
                             mVerifyAccount.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -162,9 +166,17 @@ public class StartActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            successLogin(mAuth.getCurrentUser());
-                            setupUI(true);
+                            if (mAuth.getCurrentUser().isEmailVerified()) {
+                                Log.d(TAG, "signInWithEmail:success");
+                                launchMainActivity();
+                                setupUI(true);
+                            }
+                            else {
+                                Toast.makeText(StartActivity.this, "Account is not Verified",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            //regularLogin(mAuth.getCurrentUser());
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -203,14 +215,15 @@ public class StartActivity extends AppCompatActivity {
     private void successLogin(FirebaseUser fbUser) {
         final String token = FirebaseInstanceId.getInstance().getToken();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        if (fbUser.isEmailVerified()) {
-            if (mIsLogin) {
+        //if (fbUser.isEmailVerified()) {
+            //if (mIsLogin) {
                 User user = new User();
                 user.id = fbUser.getUid();
                 user.email = fbUser.getEmail();
                 user.first_name = mFirstNameEt.getText().toString();
                 user.last_name = mLastNameEt.getText().toString();
                 user.token = token;
+                user.status = 1;
 
                 Task task = ref.child(fbUser.getUid()).setValue(user);
 
@@ -219,11 +232,15 @@ public class StartActivity extends AppCompatActivity {
                     Log.e(TAG, "Fail to save user to db");
                 } else {
                     UserAuth.getInstance().setCurrentUser(user);
-                    launchMainActivity();
+
                     Log.d(TAG, "Successfully create user in db");
+
+                    //launchMainActivity();
                 }
 
-            } else {
+            }
+
+            /*else {
                 ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
@@ -246,11 +263,14 @@ public class StartActivity extends AppCompatActivity {
                     }
                 });
             }
-        } else {
-            Toast.makeText(StartActivity.this, "Account is not Verified",
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
+        }*/
+
+
+        //else {
+        //    Toast.makeText(StartActivity.this, "Account is not Verified",
+        //            Toast.LENGTH_SHORT).show();
+        //}
+    //}
 
     // UI before email is verified
     private void updateUI(FirebaseUser user) {
