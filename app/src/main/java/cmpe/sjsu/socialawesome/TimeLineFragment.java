@@ -64,6 +64,7 @@ public class TimeLineFragment extends SocialFragment {
         mTimelineListView.setLayoutManager(mLayoutManager);
         postList = new ArrayList<>();
         postList.add(new Post(UserAuth.getInstance().getCurrentUser(), "This is the very first post.", null));
+        postList.add(new Post(UserAuth.getInstance().getCurrentUser(), "This is the most recent post.", null));
         mAdapter = new TimeLineAdapter(postList);
         mTimelineListView.setAdapter(mAdapter);
 
