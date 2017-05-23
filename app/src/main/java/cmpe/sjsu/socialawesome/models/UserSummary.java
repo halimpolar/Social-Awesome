@@ -16,5 +16,7 @@ public class UserSummary {
     public String nick_name;
     public String location;
     public String profession;
+    public String interest;
+    public String about;
 
 }
