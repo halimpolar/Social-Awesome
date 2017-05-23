@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="Visibility Setting"/>
+
+    <RadioButton
+    android:id="@+id/radio_private"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text = "Private"
+    android:onClick="onRadioButtonClick"/>
+
+    <RadioButton
+        android:id="@+id/radio_public"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "Public"
+        android:onClick="onRadioButtonClick"/>
+
+    <RadioButton
+        android:id="@+id/radio_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "Friend Only"
+        android:onClick="onRadioButtonClick"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="Receive Email Notification"/>
+
+    <RadioButton
+        android:id="@+id/radio_yes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "Yes"
+        android:onClick="onRadioButtonClick"/>
+
+    <RadioButton
+        android:id="@+id/radio_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "No"
+        android:onClick="onRadioButtonClick"/>
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"/>
+
+</RadioGroup>
