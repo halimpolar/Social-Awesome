@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:weightSum="1"
     android:orientation="vertical">
 
     <LinearLayout
@@ -17,7 +18,7 @@
 
         <EditText
             android:id="@+id/userName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
 
@@ -25,16 +26,19 @@
         android:id="@+id/subject_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:layout_weight="0.1"/>
 
     <EditText
         android:id="@+id/content_et"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_weight="0.8"/>
 
     <Button
         android:id="@+id/send_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/send" />
+        android:text="@string/send"
+        android:layout_weight="0.1"/>
 </LinearLayout>

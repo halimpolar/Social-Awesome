@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -95,6 +96,10 @@ public class InMailDetailFragment extends SocialFragment {
         DbUtils.executeByEmail(getContext(), email, new DbUtils.OnQueryDbListener() {
             @Override
             public void execute(User user) {
+                if (user == null) {
+                    Toast.makeText(getContext(), "Not a valid email, please try again", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 InMailMessage message = new InMailMessage();
                 message.userId = user.id;
                 message.subject = subject;
