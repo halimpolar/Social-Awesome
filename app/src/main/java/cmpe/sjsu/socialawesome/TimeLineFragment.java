@@ -47,6 +47,7 @@ public class TimeLineFragment extends SocialFragment {
     public static String POST_CONTENT_URL_KEY = "postContentURLKey";
     public static String FIREBASE_POST_KEY = "posts";
     public static String FIREBASE_FRIENDS_KEY = "friends";
+    public static String FIREBASE_FOLLOWING_KEY = "followingFriends";
 
     public TimeLineFragment() {
         mTitle = TimeLineFragment.class.getSimpleName();
@@ -131,13 +132,36 @@ public class TimeLineFragment extends SocialFragment {
                     friendUser.first_name = (String)friendMap.get("first_name");
                     friendUser.last_name = (String)friendMap.get("last_name");
                     friendUser.profilePhotoURL = (String)friendMap.get("profilePhotoURL");
-                    postIterator = ((HashMap)friendMap.get(FIREBASE_POST_KEY)).entrySet().iterator();
-                    while (postIterator.hasNext()) {
-                        Map.Entry postEntry = (Map.Entry) postIterator.next();
-                        HashMap postMap = (HashMap)postEntry.getValue();
-                        Post post = new Post(friendUser, (long)postMap.get("timestamp"),
-                                (String)postMap.get("contentPost"), (String)postMap.get("contentPhotoURL"));
-                        postList.add(post);
+                    HashMap detailFriendMap = (HashMap)friendMap.get(FIREBASE_POST_KEY);
+                    if (detailFriendMap != null) {
+                        postIterator = (detailFriendMap).entrySet().iterator();
+                        while (postIterator.hasNext()) {
+                            Map.Entry postEntry = (Map.Entry) postIterator.next();
+                            HashMap postMap = (HashMap) postEntry.getValue();
+                            Post post = new Post(friendUser, (long) postMap.get("timestamp"),
+                                    (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
+                            postList.add(post);
+                        }
+                    }
+                }
+                Iterator followIterator = ((HashMap)currentUser.get(FIREBASE_FOLLOWING_KEY)).entrySet().iterator();
+                while (followIterator.hasNext()) {
+                    Map.Entry followEntry = (Map.Entry) followIterator.next();
+                    HashMap followMap = (HashMap)usersMap.get(followEntry.getKey().toString());
+                    User followUser = new User();
+                    followUser.first_name = (String)followMap.get("first_name");
+                    followUser.last_name = (String)followMap.get("last_name");
+                    followUser.profilePhotoURL = (String)followMap.get("profilePhotoURL");
+                    HashMap followerMap = (HashMap)followMap.get(FIREBASE_POST_KEY);
+                    if (followerMap != null) {
+                        postIterator = followerMap.entrySet().iterator();
+                        while (postIterator.hasNext()) {
+                            Map.Entry postEntry = (Map.Entry) postIterator.next();
+                            HashMap postMap = (HashMap) postEntry.getValue();
+                            Post post = new Post(followUser, (long) postMap.get("timestamp"),
+                                    (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
+                            postList.add(post);
+                        }
                     }
                 }
                 Collections.sort(postList);
