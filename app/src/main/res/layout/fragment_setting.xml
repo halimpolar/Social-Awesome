@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text="Visibility Setting"/>
+        android:text="Visibility Setting"
+        android:textSize="20dp" />
 
     <RadioGroup
         android:id="@+id/radioGroup1"
@@ -19,29 +19,28 @@
             android:id="@+id/radio_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Private" />
+            android:text="Private" />
 
         <RadioButton
             android:id="@+id/radio_public"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Public" />
+            android:text="Public" />
 
         <RadioButton
             android:id="@+id/radio_friend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Friend Only" />
+            android:text="Friend Only" />
 
     </RadioGroup>
-
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text="Receive Email Notification"/>
+        android:text="Receive Email Notification"
+        android:textSize="20dp" />
 
     <RadioGroup
         android:id="@+id/radioGroup2"
@@ -52,13 +51,13 @@
             android:id="@+id/radio_yes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Yes" />
+            android:text="Yes" />
 
         <RadioButton
             android:id="@+id/radio_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "No" />
+            android:text="No" />
     </RadioGroup>
 
 
@@ -66,6 +65,12 @@
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back"/>
+        android:text="Back" />
+
+    <Button
+        android:id="@+id/inmail_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="new InMail" />
 
 </RadioGroup>

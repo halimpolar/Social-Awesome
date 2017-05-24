@@ -21,9 +21,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import cmpe.sjsu.socialawesome.Utils.DbUtils;
+import cmpe.sjsu.socialawesome.Utils.HTTPUtil;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.InMailMessage;
 import cmpe.sjsu.socialawesome.models.User;
@@ -37,6 +41,9 @@ import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
 public class InMailDetailFragment extends SocialFragment {
     public static final String STRING_IN_MAIL_KEY = "string_inmail_key";
+    public static final String IN_MAIL_SUBJECT = "IN_MAIL_SUBJECT";
+    public static final String IN_MAIL_MESSAGE = "IN_MAIL_MESSAGE";
+    public static final String IN_MAIL_EMAIL_ADDRESS = "IN_MAIL_EMAIL_ADDRESS";
     final DatabaseReference mSelfRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
             .child(UserAuth.getInstance().getCurrentUser().id).child(User.IN_MAIL);
     private View mUserNameEt;
@@ -141,6 +148,13 @@ public class InMailDetailFragment extends SocialFragment {
                 DatabaseReference otherRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(user.id).child(User.IN_MAIL);
                 key = otherRef.push().getKey();
                 otherRef.child(key).setValue(newInMailMessage(key, user.id, subject, content, ts, false));
+
+                Map<String, String> data = new HashMap<>();
+                data.put(IN_MAIL_SUBJECT, subject);
+                data.put(IN_MAIL_MESSAGE, content);
+                data.put(IN_MAIL_EMAIL_ADDRESS, user.email);
+                HTTPUtil.sendPushNotification(getContext(), Arrays.asList(user.token), getString(R.string.title_inmail), getString(R.string.message_inmail
+                        , UserAuth.getInstance().getCurrentUser().first_name + " " + UserAuth.getInstance().getCurrentUser().last_name), data);
             }
         });
     }

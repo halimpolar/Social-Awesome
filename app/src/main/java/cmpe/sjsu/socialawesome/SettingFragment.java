@@ -132,7 +132,14 @@ public class SettingFragment extends SocialFragment {
             }
         });
 
-
+        view.findViewById(R.id.inmail_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), InMailActivity.class);
+                intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_DETAIL);
+                startActivity(intent);
+            }
+        });
 
 
         return view;
