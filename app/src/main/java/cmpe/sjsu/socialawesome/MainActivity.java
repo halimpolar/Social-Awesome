@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     transaction.replace(R.id.content_frame, fragment);
                     transaction.commit();
                     mDrawerLayout.closeDrawers();
+                    setTitle(title);
                 }
             }
         });
@@ -123,6 +124,15 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+
+        String title = getString(R.string.timeline);
+        SocialFragment fragment = new TimeLineFragment();
+        mCurrentFragment = fragment;
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+        transaction.commit();
     }
 
     @Override
