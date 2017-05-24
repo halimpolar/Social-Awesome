@@ -108,8 +108,7 @@ public class TimeLineFragment extends SocialFragment {
     }
 
     private void initPostListFromServer() {
-
-        userTableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userTableRef.addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 postList = new ArrayList<>();
