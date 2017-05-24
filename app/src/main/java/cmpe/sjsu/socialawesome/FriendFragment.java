@@ -25,6 +25,7 @@ import cmpe.sjsu.socialawesome.models.UserIDMap;
 import cmpe.sjsu.socialawesome.models.UserSummary;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
+import static cmpe.sjsu.socialawesome.models.User.FOLOWING_FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.PENDING_FRIEND_LIST;
 import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
@@ -68,7 +69,6 @@ public class FriendFragment extends SocialFragment {
             public void onClick(View v) {
                 mFriendList = new ArrayList<>();
                 getFriendList(WAITING_FRIEND_LIST);
-//                mAdapter.updateList(mOutGoingFriendList);
             }
         });
 
@@ -76,7 +76,6 @@ public class FriendFragment extends SocialFragment {
         PendingFriendRequstBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                acceptReqBtn.setVisibility(View.VISIBLE);
                 mFriendList = new ArrayList<>();
                 getFriendList(PENDING_FRIEND_LIST);
             }
@@ -91,13 +90,19 @@ public class FriendFragment extends SocialFragment {
             }
         });
 
+        Button followingFriendBtn = (Button) view.findViewById(R.id.following_friend_btn);
+        followingFriendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFriendList = new ArrayList<>();
+                getFriendList(FOLOWING_FRIEND_LIST);
+            }
+        });
+
         Button addFriendBtn = (Button) view.findViewById(R.id.add_friend_btn);
         addFriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                acceptReqBtn.setVisibility(View.VISIBLE);
-//                acceptReqBtn.setText("Follow");
-//                addSelFriendBtn.setVisibility(View.VISIBLE);
                 mFriendList = new ArrayList<>();
                 getPublicUser();
             }
@@ -106,32 +111,6 @@ public class FriendFragment extends SocialFragment {
 
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder{
-        Button acceptReqBtn;
-        Button addSelFriendBtn;
-        MyViewHolder(View view){
-            super(view);
-            this.acceptReqBtn = (Button) view.findViewById(R.id.accept_request_button);
-            this.addSelFriendBtn = (Button) view.findViewById(R.id.add_select_friend_button);
-
-        }
-    }
-
-//    @Override
-//    public void onBindViewHolder(MyViewHolder myViewHolder, int i){
-//        myViewHolder.acceptReqBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                /// button click event
-//            }
-//        });
-//        myViewHolder.addSelFriendBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                /// button click event
-//            }
-//        });
-//    }
 
     @Override
     public void onStart() {
@@ -140,7 +119,7 @@ public class FriendFragment extends SocialFragment {
         getFriendList(FRIEND_LIST);
     }
 
-    private void getFriendList(String node) {
+    private void getFriendList(final String node) {
 
         final DatabaseReference friendRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id).child(node);
         friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -153,6 +132,23 @@ public class FriendFragment extends SocialFragment {
                     mAdapter.notifyDataSetChanged();
                 }
                 mAdapter = new FriendListAdapter(mFriendList);
+                int type = 0;
+                switch(node){
+                    case FRIEND_LIST:
+                        type = 0;
+                        break;
+                    case WAITING_FRIEND_LIST:
+                        type = 1;
+                        break;
+                    case PENDING_FRIEND_LIST:
+                        type = 2;
+                        break;
+                    case FOLOWING_FRIEND_LIST:
+                        type = 4;
+                        break;
+                    default:
+                }
+                mAdapter.updateType(type);
                 recList.setAdapter(mAdapter);
             }
 
@@ -164,9 +160,8 @@ public class FriendFragment extends SocialFragment {
     }
 
     private void getPublicUser() {
-
         final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        Query query = userTableRef.orderByChild("status").equalTo("2");
+        Query query = userTableRef.orderByChild("status").equalTo(2);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -177,6 +172,7 @@ public class FriendFragment extends SocialFragment {
                     mAdapter.notifyDataSetChanged();
                 }
                 mAdapter = new FriendListAdapter(mFriendList);
+                mAdapter.updateType(3);
                 recList.setAdapter(mAdapter);
             }
 

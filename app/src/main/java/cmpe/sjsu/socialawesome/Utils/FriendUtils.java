@@ -133,6 +133,8 @@ public class FriendUtils {
                 dialogDuplicate = "You already followed ";
                 dialogSuccess = "You are now following ";
                 dialogPrivate = "You can't follow user whose profile is not public!";
+
+                //TODO: you are already friend with
                 break;
             default:
         }

@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if (fragment != null && !fragment.getTitle().equals(title)) {
                     mCurrentFragment = fragment;
-
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction transaction = fm.beginTransaction();
                     transaction.replace(R.id.content_frame, fragment);
