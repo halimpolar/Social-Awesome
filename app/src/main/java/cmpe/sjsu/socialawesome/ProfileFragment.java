@@ -125,6 +125,7 @@ public class ProfileFragment extends SocialFragment {
         activity = (MainActivity) getActivity();
         if (activity.isOtherUser && activity.otherUserId != null) {
             currentUserId = activity.otherUserId;
+            mEditBtn.setVisibility(View.GONE);
         } else {
             currentUserId = UserAuth.getInstance().getCurrentUser().id;
         }
@@ -179,6 +180,16 @@ public class ProfileFragment extends SocialFragment {
                 mFirebaseDatabase.child("profession").setValue(profession);
                 mFirebaseDatabase.child("about_me").setValue(about_me);
                 mFirebaseDatabase.child("interest").setValue(interest);
+
+
+                UserAuth.getInstance().getCurrentUser().first_name = first_name;
+                UserAuth.getInstance().getCurrentUser().last_name = last_name;
+                UserAuth.getInstance().getCurrentUser().email = email;
+                UserAuth.getInstance().getCurrentUser().location = location;
+                UserAuth.getInstance().getCurrentUser().nickname = nickname;
+                UserAuth.getInstance().getCurrentUser().profession = profession;
+                UserAuth.getInstance().getCurrentUser().about_me = about_me;
+                UserAuth.getInstance().getCurrentUser().interest = interest;
                 Toast.makeText(getActivity(), "Profile Has Been Updated",Toast.LENGTH_SHORT).show();
 
                 mEditBtn.setVisibility(View.VISIBLE);

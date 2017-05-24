@@ -87,7 +87,9 @@ public class MainActivity extends AppCompatActivity {
                     case 4:
                         //Sign Out
                         title = getString(R.string.signout);
-                        signout();
+                        signOut();
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(MainActivity.this, StartActivity.class));
                         break;
                     default:
                         break;
@@ -180,10 +182,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void signout() {
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-            FirebaseAuth.getInstance().signOut();
+    public void signOut() {
+        if(mAuthListener != null) {
+            mAuth.signOut();
         }
+
     }
 }
