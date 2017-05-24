@@ -63,7 +63,7 @@ public class FriendFragment extends SocialFragment {
     @Override
     public void onStart() {
         super.onStart();
-        FriendUtils.unFollowFriend(getActivity(), 0, "NavUTJHA91azs7Un6iA69VDf7JX2");
+//        FriendUtils.unFollowFriend(getActivity(), 0, "NavUTJHA91azs7Un6iA69VDf7JX2");
         getFriendList(FRIEND_LIST);
     }
 
