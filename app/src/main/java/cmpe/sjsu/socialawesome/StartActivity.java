@@ -64,9 +64,7 @@ public class StartActivity extends AppCompatActivity {
         mResendVerification = (Button) findViewById(R.id.resend_verification);
         //Fields
         mEmailEt = (EditText) findViewById(R.id.email);
-        //mEmailEt.setText("sterling.tarng@sjsu.edu");
         mPasswordEt = (EditText) findViewById(R.id.password);
-        //mPasswordEt.setText("Test$123");
         mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);
@@ -206,48 +204,49 @@ public class StartActivity extends AppCompatActivity {
         final String token = FirebaseInstanceId.getInstance().getToken();
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         if (fbUser.isEmailVerified()) {
-            if (!mIsLogin) {
-                User user = new User();
-                user.id = fbUser.getUid();
-                user.email = fbUser.getEmail();
-                user.first_name = mFirstNameEt.getText().toString();
-                user.last_name = mLastNameEt.getText().toString();
-                user.token = token;
 
-                Task task = ref.child(fbUser.getUid()).setValue(user);
+            ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
+                @Override
+                public Transaction.Result doTransaction(MutableData mutableData) {
+                    User user = mutableData.getValue(User.class);
+                    if (user != null) {
 
-                if (!task.isSuccessful()) {
-                    //TODO: show text fail to save user to db
-                    Log.e(TAG, "Fail to save user to db");
-                } else {
-                    UserAuth.getInstance().setCurrentUser(user);
-                    launchMainActivity();
-                    Log.d(TAG, "Successfully create user in db");
-                }
-            } else {
-                ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        User user = mutableData.getValue(User.class);
-                        if (user != null) {
+                        if (token != null && !token.equals(user.token)) {
+                            user.token = token;
+                            ref.child(fbUser.getUid()).child("token").setValue(token);
+                        }
 
-                            if (token != null && !token.equals(user.token)) {
-                                user.token = token;
-                                ref.child(fbUser.getUid()).child("token").setValue(token);
-                            }
+                        UserAuth.getInstance().setCurrentUser(user);
+                        launchMainActivity();
+                    } else {
+                        user = new User();
+                        user.id = fbUser.getUid();
+                        user.email = fbUser.getEmail();
+                        user.first_name = mFirstNameEt.getText().toString();
+                        user.last_name = mLastNameEt.getText().toString();
+                        user.status = 1;
+                        user.token = token;
 
+                        Task task = ref.child(fbUser.getUid()).setValue(user);
+
+                        if (!task.isSuccessful()) {
+                            //TODO: show text fail to save user to db
+                            Log.e(TAG, "Fail to save user to db");
+                        } else {
                             UserAuth.getInstance().setCurrentUser(user);
                             launchMainActivity();
+                            Log.d(TAG, "Successfully create user in db");
                         }
-                        return Transaction.success(mutableData);
                     }
+                    return Transaction.success(mutableData);
+                }
 
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                        Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-                    }
-                });
-            }
+                @Override
+                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                }
+            });
+
         } else {
             Toast.makeText(StartActivity.this, "Account is not Verified",
                     Toast.LENGTH_SHORT).show();
