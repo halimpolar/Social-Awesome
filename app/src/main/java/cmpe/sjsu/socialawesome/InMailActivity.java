@@ -11,6 +11,7 @@ public class InMailActivity extends AppCompatActivity {
     public static final String ACTION_LIST = "open_list_message";
     public static final String ACTION_DETAIL = "open_new_message";
     public static final String ACTION_EXTRA = "open_new_message";
+    public static final String BUNDLE_MESSAGE_ID = "bundle_message_id";
 
     private SocialFragment mFragment;
 
@@ -37,9 +38,11 @@ public class InMailActivity extends AppCompatActivity {
                     break;
             }
 
-//            Bundle bundle = new Bundle(1);
-//            bundle.putSerializable(PrivateMessageChatFragment.OTHER_USER_BUNDLE, otherUser);
-//            mFragment.setArguments(bundle);
+            if (getIntent().getStringExtra(BUNDLE_MESSAGE_ID) != null) {
+                Bundle bundle = new Bundle(1);
+                bundle.putString(BUNDLE_MESSAGE_ID, getIntent().getStringExtra(BUNDLE_MESSAGE_ID));
+                mFragment.setArguments(bundle);
+            }
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction transaction = fm.beginTransaction();

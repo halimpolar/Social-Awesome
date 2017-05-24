@@ -14,4 +14,5 @@ public class InMailMessage {
     public String content;
     public String subject;
     public String id;
+    public boolean self;
 }

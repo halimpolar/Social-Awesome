@@ -16,4 +16,8 @@ public abstract class SocialFragment extends Fragment {
     public void setTitle(String title) {
         mTitle = title;
     }
+
+    public void onRefresh() {
+
+    }
 }

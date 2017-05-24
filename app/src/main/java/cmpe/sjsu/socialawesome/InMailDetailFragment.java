@@ -16,11 +16,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 import cmpe.sjsu.socialawesome.Utils.DbUtils;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.InMailMessage;
 import cmpe.sjsu.socialawesome.models.User;
 
+import static cmpe.sjsu.socialawesome.InMailActivity.BUNDLE_MESSAGE_ID;
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
 /**
@@ -60,8 +64,8 @@ public class InMailDetailFragment extends SocialFragment {
             }
         });
 
-        if (getArguments() != null && getArguments().getString(STRING_IN_MAIL_KEY) != null) {
-            String inMailKey = getArguments().getString(STRING_IN_MAIL_KEY);
+        if (getArguments() != null && getArguments().getString(BUNDLE_MESSAGE_ID) != null) {
+            String inMailKey = getArguments().getString(BUNDLE_MESSAGE_ID);
             loadChat(inMailKey);
         }
     }
@@ -100,20 +104,27 @@ public class InMailDetailFragment extends SocialFragment {
                     Toast.makeText(getContext(), "Not a valid email, please try again", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                InMailMessage message = new InMailMessage();
-                message.userId = user.id;
-                message.subject = subject;
-                message.content = content;
-                message.lastTimeStamp = Double.toString(System.currentTimeMillis() / 1000);
 
+                String ts = System.currentTimeMillis() + "";
                 String key = mSelfRef.push().getKey();
-                mSelfRef.child(key).setValue(message);
+                mSelfRef.child(key).setValue(newInMailMessage(key, user.id, subject, content, ts, true));
 
                 DatabaseReference otherRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(user.id).child(User.IN_MAIL);
                 key = otherRef.push().getKey();
-                otherRef.child(key).setValue(message);
-
+                otherRef.child(key).setValue(newInMailMessage(key, user.id, subject, content, ts, false));
             }
         });
+    }
+
+    private InMailMessage newInMailMessage(String id, String userId, String subject, String content, String ts, boolean self) {
+        InMailMessage message = new InMailMessage();
+        message.id = id;
+        message.userId = userId;
+        message.subject = subject;
+        message.content = content;
+        message.lastTimeStamp = DateFormat.getDateTimeInstance().format(new Date());
+        message.self = true;
+
+        return message;
     }
 }

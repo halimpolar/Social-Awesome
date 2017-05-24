@@ -39,18 +39,19 @@ public class UserAuth {
 
     public void setCurrentUser(User user) {
         mCurrentUser = user;
-        setCurrentUserSummary(user);
+//        setCurrentUserSummary(user);
+//        setCurrentUserSummary(user);
         setCurrentUserIdMap(user);
     }
 
-    public void setCurrentUserSummary(User user) {
-        mCurrentUserSummary.id = user.id;
-        mCurrentUserSummary.email = user.email;
-        mCurrentUserSummary.first_name = user.first_name;
-        mCurrentUserSummary.last_name = user.last_name;
-        mCurrentUserSummary.profilePhotoURL = user.profilePhotoURL;
-        mCurrentUserSummary.status = user.status;
-    }
+//    public void setCurrentUserSummary(User user) {
+//        mCurrentUserSummary.id = user.id;
+//        mCurrentUserSummary.email = user.email;
+//        mCurrentUserSummary.first_name = user.first_name;
+//        mCurrentUserSummary.last_name = user.last_name;
+//        mCurrentUserSummary.profilePhotoURL = user.profilePhotoURL;
+//        mCurrentUserSummary.status = user.status;
+//    }
 
     public void setCurrentUserIdMap(User user) {
         mCurrentUserIdMap.id = user.id;

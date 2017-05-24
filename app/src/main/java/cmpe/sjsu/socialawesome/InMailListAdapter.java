@@ -39,6 +39,9 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
             @Override
             public void execute(User user) {
                 holder.mUserNameEt.setText(user.email);
+                holder.mSubjectEt.setText(message.subject);
+                holder.mTimestampEt.setText(message.lastTimeStamp);
+                holder.mSendRcv.setText(message.self ? holder.mRootView.getContext().getString(R.string.sent) : holder.mRootView.getContext().getString(R.string.received));
             }
         });
 
@@ -66,6 +69,7 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
         public TextView mUserNameEt;
         public TextView mSubjectEt;
         public TextView mTimestampEt;
+        public TextView mSendRcv;
         public View mRootView;
 
         public ViewHolder(View view) {
@@ -75,6 +79,7 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
             mUserNameEt = (TextView) view.findViewById(R.id.userName_et);
             mSubjectEt = (TextView) view.findViewById(R.id.subject_et);
             mTimestampEt = (TextView) view.findViewById(R.id.timestamp_et);
+            mSendRcv = (TextView) view.findViewById(R.id.sent_rcv);
         }
     }
 }
