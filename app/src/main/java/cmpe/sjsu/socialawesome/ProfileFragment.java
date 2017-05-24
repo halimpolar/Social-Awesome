@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +22,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
+import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
+import cmpe.sjsu.socialawesome.models.Post;
 import cmpe.sjsu.socialawesome.models.User;
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
@@ -47,6 +57,9 @@ public class ProfileFragment extends SocialFragment {
     private String currentUserId;
     private MainActivity activity;
 
+    private RecyclerView mTimelineListView;
+    private ArrayList<Post> postList;
+
     public ProfileFragment()  {
         mTitle = ProfileFragment.class.getSimpleName();
     }
@@ -69,6 +82,7 @@ public class ProfileFragment extends SocialFragment {
         mInterestEt = (EditText) view.findViewById(R.id.interests);
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
         mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
+        mTimelineListView = (RecyclerView) view.findViewById(R.id.timelineListView);
 
         return view;
     }
@@ -87,6 +101,9 @@ public class ProfileFragment extends SocialFragment {
         mInterestEt.setVisibility(View.GONE);
         mUpdateBtn.setVisibility(View.GONE);
         mCancelBtn.setVisibility(View.GONE);
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        mTimelineListView.setLayoutManager(mLayoutManager);
 
         mEditBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,14 +154,28 @@ public class ProfileFragment extends SocialFragment {
 
         mFirebaseDatabase.runTransaction(new Transaction.Handler() {
             @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
+            public Transaction.Result doTransaction(final MutableData mutableData) {
 
                 final User user = mutableData.getValue(User.class);
                 if (user != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            postList = new ArrayList<>();
+                            HashMap posts = ((HashMap)((HashMap)mutableData.getValue()).get("posts"));
+                            Iterator postIterator = posts.entrySet().iterator();
+                            while (postIterator.hasNext()) {
+                                Map.Entry entry = (Map.Entry) postIterator.next();
+                                HashMap postMap = (HashMap)entry.getValue();
+                                Post post = new Post(user, (long)postMap.get("timestamp"),
+                                        (String)postMap.get("contentPost"), (String)postMap.get("contentPhotoURL"));
+                                postList.add(post);
+                            }
+
                             populateInfoIntoEditText(user);
+                            Collections.sort(postList);
+                            TimeLineAdapter mAdapter = new TimeLineAdapter(postList);
+                            mTimelineListView.setAdapter(mAdapter);
                         }
                     });
 
