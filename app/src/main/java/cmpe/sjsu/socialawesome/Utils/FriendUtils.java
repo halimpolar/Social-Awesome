@@ -1,9 +1,6 @@
 package cmpe.sjsu.socialawesome.Utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,7 +11,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 import cmpe.sjsu.socialawesome.models.User;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 import cmpe.sjsu.socialawesome.models.UserSummary;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
@@ -45,7 +45,7 @@ public class FriendUtils {
                 if (dataSnapshot.getValue() == null) {
                     new Thread(new Runnable() {
                         public void run() {
-                            emailFriendRequest(context, email, UserAuth.getCurrentUserSummary());
+                            emailFriendRequest(context, email, UserAuth.getInstance().getCurrentUser());
                         }
                     }).start();
                     UserSummary newUserSummary = new UserSummary();
@@ -54,8 +54,8 @@ public class FriendUtils {
                 } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);
-                        getUserSummary(user);
-                        addFriend(context, 0, mSummary);
+//                        getUserSummary(user);
+                        addFriend(context, 0, user);
                     }
                 }
             }
@@ -66,22 +66,13 @@ public class FriendUtils {
         });
     }
 
-    public static void getUserSummary(User user) {
-        mSummary.id = user.id;
-        mSummary.email = user.email;
-        mSummary.first_name = user.first_name;
-        mSummary.last_name = user.last_name;
-        mSummary.profilePhotoURL = user.profilePhotoURL;
-        mSummary.status = user.status;
-    }
-
-    private static void emailFriendRequest(final Context context, final String email, final UserSummary userSummary) {
+    private static void emailFriendRequest(final Context context, final String email, final User user) {
         Mail m = new Mail("bingtest0112@gmail.com", "01120112");
         String[] toArr = {email};
         m.setTo(toArr);
         m.setFrom("bingtest0112@gmail.com");
-        m.setSubject("Invitation from " + userSummary.first_name + " " + userSummary.last_name);
-        m.setBody("Your friend " + userSummary.first_name + " " + userSummary.last_name + " is inviting you to join our app, SocialAwesome!");
+        m.setSubject("Invitation from " + user.first_name + " " + user.last_name);
+        m.setBody("Your friend " + user.first_name + " " + user.last_name + " is inviting you to join our app, SocialAwesome!");
         try {
             if (m.send()) {
 //                Toast.makeText(context, "Email was sent successfully.", Toast.LENGTH_LONG).show();
@@ -102,23 +93,11 @@ public class FriendUtils {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() == null) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                    alertDialogBuilder.setTitle("Error");
-                    alertDialogBuilder
-                            .setMessage("Id did not exist!")
-                            .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
+                    Toast.makeText(context, "Error: Id did not exist!", Toast.LENGTH_SHORT).show();
                 } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);
-                        getUserSummary(user);
-                        addFriend(context, type, mSummary);
+                        addFriend(context, type, user);
                     }
                 }
             }
@@ -133,7 +112,7 @@ public class FriendUtils {
 //        UserSummary mySummary = UserAuth.getInstance().getCurrentUserSummary();
 //        FriendUtils.addFriend(getActivity(), 1, mySummary);
     //type: 0-friend, 1-follow
-    public static void addFriend(final Context context, int type, final UserSummary summaryReceive) {
+    public static void addFriend(final Context context, int type, final User user) {
         String nodeSent = null;
         String nodeReceive = null;
         String dialogSuccess = null;
@@ -156,80 +135,37 @@ public class FriendUtils {
                 break;
             default:
         }
-        if (summaryReceive.id.equals(UserAuth.getInstance().getCurrentUser().id)) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-            alertDialogBuilder.setTitle("Error");
-            alertDialogBuilder
-                    .setMessage("You can't follow or be friend with yourself!")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+        if (user.id.equals(UserAuth.getInstance().getCurrentUser().id)) {
+            Toast.makeText(context, "Error: You can't follow or be friend with yourself!", Toast.LENGTH_SHORT).show();
         } else {
-            if (summaryReceive.status == 2) {
+            if (user.status == 2) {
                 final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
                 final DatabaseReference currentUserRef = userTableRef.child(UserAuth.getInstance().getCurrentUser().id);
                 final DatabaseReference currentUserFollowRef = currentUserRef.child(nodeSent);
-                final DatabaseReference followerRef = userTableRef.child(summaryReceive.id).child(nodeReceive);
-                final String receiveName = summaryReceive.first_name + summaryReceive.last_name;
+                final DatabaseReference followerRef = userTableRef.child(user.id).child(nodeReceive);
+                final String receiveName = user.first_name + user.last_name;
                 final String dialogDuFinal = dialogDuplicate;
                 final String dialogSuFinal = dialogSuccess;
 
                 currentUserFollowRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child(summaryReceive.id).exists()) {
-                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                            alertDialogBuilder.setTitle("Error");
-                            alertDialogBuilder
-                                    .setMessage(dialogDuFinal + receiveName + "!")
-                                    .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-                            AlertDialog alertDialog = alertDialogBuilder.create();
-                            alertDialog.show();
+                        if (dataSnapshot.child(user.id).exists()) {
+                            Toast.makeText(context, "Error: " + dialogDuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
                         } else {
-                            currentUserFollowRef.child(summaryReceive.id).setValue(summaryReceive);
-                            followerRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getInstance().getCurrentUserSummary());
-                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                            alertDialogBuilder.setTitle("Success");
-                            alertDialogBuilder
-                                    .setMessage(dialogSuFinal + receiveName + "!")
-                                    .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-                            AlertDialog alertDialog = alertDialogBuilder.create();
-                            alertDialog.show();
+                            UserIDMap idMap = new UserIDMap();
+                            idMap.id =  user.id;
+                            currentUserFollowRef.child(user.id).setValue(idMap);
+                            followerRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserIdMap());
+                            Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
             } else {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                alertDialogBuilder.setTitle("Error");
-                alertDialogBuilder
-                        .setMessage(dialogPrivate)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
+                Toast.makeText(context, "Error: " + dialogPrivate+ "!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -244,23 +180,11 @@ public class FriendUtils {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() == null) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                    alertDialogBuilder.setTitle("Error");
-                    alertDialogBuilder
-                            .setMessage("Id did not exist!")
-                            .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
+                    Toast.makeText(context, "Error: Id did not exist!", Toast.LENGTH_SHORT).show();
                 } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);
-                        getUserSummary(user);
-                        unFollowFriend(context, type, mSummary);
+                        unFollowFriend(context, type, user);
                     }
                 }
             }
@@ -271,7 +195,7 @@ public class FriendUtils {
     }
 
     //type: 0-friend, 1-follow
-    public static void unFollowFriend(final Context context, int type, final UserSummary summaryReceive) {
+    public static void unFollowFriend(final Context context, int type, final User user) {
         String nodeSent = null;
         String nodeReceive = null;
         String dialogSuccess = null;
@@ -297,8 +221,8 @@ public class FriendUtils {
         //my following, my pending
         final DatabaseReference currentUserFollowRef = currentUserRef.child(nodeSent);
         //other follower, other waiting
-        final DatabaseReference followerRef = userTableRef.child(summaryReceive.id).child(nodeReceive);
-        final String receiveName = summaryReceive.first_name + summaryReceive.last_name;
+        final DatabaseReference followerRef = userTableRef.child(user.id).child(nodeReceive);
+        final String receiveName = user.first_name + user.last_name;
         final String dialogSuFinal = dialogSuccess;
         final String dialogErrorFinal = dialogError;
         final int functionType = type;
@@ -306,38 +230,18 @@ public class FriendUtils {
         currentUserFollowRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(summaryReceive.id).exists()) {
-                    currentUserFollowRef.child(summaryReceive.id).removeValue();
+                if (dataSnapshot.child(user.id).exists()) {
+                    currentUserFollowRef.child(user.id).removeValue();
                     followerRef.child(UserAuth.getInstance().getCurrentUser().id).removeValue();
                     if (functionType == 0) {
-                        currentUserRef.child(FRIEND_LIST).child(summaryReceive.id).setValue(summaryReceive);
-                        userTableRef.child(summaryReceive.id).child(FRIEND_LIST).child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getInstance().getCurrentUserSummary());
+                        UserIDMap idMap = new UserIDMap();
+                        idMap.id =  user.id;
+                        currentUserRef.child(FRIEND_LIST).child(user.id).setValue(idMap);
+                        userTableRef.child(user.id).child(FRIEND_LIST).child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getInstance().getCurrentUserIdMap());
                     }
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                    alertDialogBuilder.setTitle("Success");
-                    alertDialogBuilder
-                            .setMessage(dialogSuFinal + receiveName + "!")
-                            .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
+                    Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!" , Toast.LENGTH_SHORT).show();
                 } else {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                    alertDialogBuilder.setTitle("Error");
-                    alertDialogBuilder
-                            .setMessage(dialogErrorFinal + receiveName + "!")
-                            .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
+                    Toast.makeText(context, "Error: " + dialogErrorFinal + receiveName + "!" , Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -346,72 +250,4 @@ public class FriendUtils {
             }
         });
     }
-
-//    public static UserSummary getSummaryById(final Context context, String id) {
-//        final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-//        Query query = userTableRef.orderByChild("id").equalTo(id);
-//        query.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.getValue() == null) {
-//                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-//                    alertDialogBuilder.setTitle("Error");
-//                    alertDialogBuilder
-//                            .setMessage("Id did not exist!")
-//                            .setCancelable(false)
-//                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int id) {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//                    AlertDialog alertDialog = alertDialogBuilder.create();
-//                    alertDialog.show();
-//                } else {
-//                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                        User user = postSnapshot.getValue(User.class);
-//                        getUserSummary(user);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-//        return mSummary;
-//    }
-
-//    public static UserSummary getSummaryByEmail(final Context context, String email) {
-//        final DatabaseReference userTableRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-//        Query query = userTableRef.orderByChild("email").equalTo(email);
-//        query.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.getValue() == null) {
-//                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-//                    alertDialogBuilder.setTitle("Error");
-//                    alertDialogBuilder
-//                            .setMessage("Email did not exist!")
-//                            .setCancelable(false)
-//                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int id) {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//                    AlertDialog alertDialog = alertDialogBuilder.create();
-//                    alertDialog.show();
-//                } else {
-//                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                        User user = postSnapshot.getValue(User.class);
-//                        getUserSummary(user);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-//        return mSummary;
-//    }
 }

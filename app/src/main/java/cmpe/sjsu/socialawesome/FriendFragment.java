@@ -16,8 +16,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import cmpe.sjsu.socialawesome.Utils.FriendUtils;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.User;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 import cmpe.sjsu.socialawesome.models.UserSummary;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
@@ -27,7 +29,7 @@ import static cmpe.sjsu.socialawesome.models.User.FRIEND_LIST;
  * A placeholder fragment containing a simple view.
  */
 public class FriendFragment extends SocialFragment {
-    private static ArrayList<UserSummary> mFriendList = new ArrayList<>();
+    private static ArrayList<String> mFriendList = new ArrayList<>();
     private RecyclerView recList;
     private FriendListAdapter mAdapter;
 
@@ -35,27 +37,14 @@ public class FriendFragment extends SocialFragment {
         mTitle = FriendFragment.class.getSimpleName();
     }
 
-    private static void addFriendList(UserSummary userSummary) {
-        mFriendList.add(userSummary);
-    }
-
-    private static UserSummary getUserSummary(User user) {
-        UserSummary userSummary = new UserSummary();
-        userSummary.id = user.id;
-        userSummary.email = user.email;
-        userSummary.first_name = user.first_name;
-        userSummary.last_name = user.last_name;
-        userSummary.profilePhotoURL = user.profilePhotoURL;
-        userSummary.status = user.status;
-        return userSummary;
+    private static void addFriendList(String id) {
+        mFriendList.add(id);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.fragment_friend, container, false);
-
         return v;
     }
 
@@ -74,6 +63,7 @@ public class FriendFragment extends SocialFragment {
     @Override
     public void onStart() {
         super.onStart();
+        FriendUtils.unFollowFriend(getActivity(), 0, "NavUTJHA91azs7Un6iA69VDf7JX2");
         getFriendList(FRIEND_LIST);
     }
 
@@ -83,12 +73,9 @@ public class FriendFragment extends SocialFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    UserSummary userSummary = postSnapshot.getValue(UserSummary.class);
-//                UserSummary userSummary = getUserSummary(user);
-                    mFriendList.add(userSummary);
+                    UserIDMap friendIdMap = postSnapshot.getValue(UserIDMap.class);
+                    mFriendList.add(friendIdMap.id);
                     mAdapter.notifyDataSetChanged();
-//                    addFriendList(userSummary);
-
                 }
                 mAdapter = new FriendListAdapter(mFriendList);
                 recList.setAdapter(mAdapter);
@@ -99,38 +86,6 @@ public class FriendFragment extends SocialFragment {
 
             }
         });
-
-//        Query query = mSelfRef.orderByChild("last_name");
-//        query.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                User user = dataSnapshot.getValue(User.class);
-//                UserSummary userSummary = getUserSummary(user);
-//                addFriendList(userSummary);
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//        mFriendList.add(UserAuth.getCurrentUserSummary());
     }
 
 }

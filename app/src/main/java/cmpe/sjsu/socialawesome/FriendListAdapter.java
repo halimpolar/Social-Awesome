@@ -9,7 +9,11 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
+import cmpe.sjsu.socialawesome.Utils.DbUtils;
+import cmpe.sjsu.socialawesome.models.User;
 import cmpe.sjsu.socialawesome.models.UserSummary;
+
+import static android.R.id.message;
 
 /**
  * Created by bing on 5/13/17.
@@ -17,9 +21,9 @@ import cmpe.sjsu.socialawesome.models.UserSummary;
 
 
 public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.FriendViewHolder>{
-    private List<UserSummary> entryList;
+    private List<String> entryList;
 
-    public FriendListAdapter(List<UserSummary> entryList) {
+    public FriendListAdapter(List<String> entryList) {
         this.entryList = entryList;
 //        Collections.sort(this.entryList, new DateComparator());
     }
@@ -33,13 +37,23 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
     }
 
     @Override
-    public void onBindViewHolder(FriendViewHolder holder, int position) {
-        UserSummary entry = entryList.get(position);
-        holder.vName.setText(entry.first_name + " " + entry.last_name);
-        holder.vNickName.setText("Nick Name:  " + entry.nick_name);
-        holder.vEmail.setText("Email:            " + entry.email);
-        holder.vLocation.setText("Location:      " + entry.location);
-        holder.vProfession.setText("Profession:   " + entry.profession);
+    public void onBindViewHolder(final FriendViewHolder holder, int position) {
+        String entry = entryList.get(position);
+        DbUtils.executeById(holder.vEmail.getContext(), entry, new DbUtils.OnQueryDbListener() {
+            @Override
+            public void execute(User user) {
+                holder.vName.setText(user.first_name + " " + user.last_name);
+                holder.vEmail.setText("Email:            " + user.email);
+                holder.vLocation.setText("Location:      " + user.location);
+                holder.vProfession.setText("Profession:   " + user.profession);
+            }
+        });
+
+//        holder.vName.setText(user.first_name + " " + user.last_name);
+//        holder.vNickName.setText("Nick Name:  " + user.nick_name);
+//        holder.vEmail.setText("Email:            " + user.email);
+//        holder.vLocation.setText("Location:      " + user.location);
+//        holder.vProfession.setText("Profession:   " + user.profession);
         //TODO: setimageurl: http://stackoverflow.com/questions/2471935/how-to-load-an-imageview-by-url-in-android
 
     }

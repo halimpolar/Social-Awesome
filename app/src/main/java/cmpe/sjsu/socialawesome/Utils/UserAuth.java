@@ -3,6 +3,7 @@ package cmpe.sjsu.socialawesome.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 
 import cmpe.sjsu.socialawesome.models.User;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 import cmpe.sjsu.socialawesome.models.UserSummary;
 
 /**
@@ -13,6 +14,8 @@ public class UserAuth {
     private static final UserAuth mInstance = new UserAuth();
     private static User mCurrentUser;
     private static UserSummary mCurrentUserSummary = new UserSummary();
+    private static UserIDMap mCurrentUserIdMap = new UserIDMap();
+
 
 
     private UserAuth() {
@@ -26,6 +29,10 @@ public class UserAuth {
         return mCurrentUser;
     }
 
+    public static UserIDMap getCurrentUserIdMap(){
+        return mCurrentUserIdMap;
+    }
+
     public static UserSummary getCurrentUserSummary() {
         return mCurrentUserSummary;
     }
@@ -33,6 +40,7 @@ public class UserAuth {
     public void setCurrentUser(User user) {
         mCurrentUser = user;
         setCurrentUserSummary(user);
+        setCurrentUserIdMap(user);
     }
 
     public void setCurrentUserSummary(User user) {
@@ -42,6 +50,10 @@ public class UserAuth {
         mCurrentUserSummary.last_name = user.last_name;
         mCurrentUserSummary.profilePhotoURL = user.profilePhotoURL;
         mCurrentUserSummary.status = user.status;
+    }
+
+    public void setCurrentUserIdMap(User user) {
+        mCurrentUserIdMap.id = user.id;
     }
 
     public void signOut() {
