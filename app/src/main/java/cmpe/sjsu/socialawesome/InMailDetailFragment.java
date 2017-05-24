@@ -30,6 +30,7 @@ import cmpe.sjsu.socialawesome.Utils.DbUtils;
 import cmpe.sjsu.socialawesome.Utils.HTTPUtil;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.InMailMessage;
+import cmpe.sjsu.socialawesome.models.PushMessageContent;
 import cmpe.sjsu.socialawesome.models.User;
 
 import static cmpe.sjsu.socialawesome.InMailActivity.BUNDLE_MESSAGE_ID;
@@ -153,6 +154,7 @@ public class InMailDetailFragment extends SocialFragment {
                 data.put(IN_MAIL_SUBJECT, subject);
                 data.put(IN_MAIL_MESSAGE, content);
                 data.put(IN_MAIL_EMAIL_ADDRESS, user.email);
+                data.put(PushMessageContent.ACTION_PUSH_MESSAGE, InMailActivity.IN_MAIL_ACTION);
                 HTTPUtil.sendPushNotification(getContext(), Arrays.asList(user.token), getString(R.string.title_inmail), getString(R.string.message_inmail
                         , UserAuth.getInstance().getCurrentUser().first_name + " " + UserAuth.getInstance().getCurrentUser().last_name), data);
             }

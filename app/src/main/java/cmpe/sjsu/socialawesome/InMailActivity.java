@@ -12,6 +12,7 @@ public class InMailActivity extends AppCompatActivity {
     public static final String ACTION_DETAIL = "open_new_message";
     public static final String ACTION_EXTRA = "open_new_message";
     public static final String BUNDLE_MESSAGE_ID = "bundle_message_id";
+    public static final String IN_MAIL_ACTION= "action_in_mail";
 
     private SocialFragment mFragment;
 
