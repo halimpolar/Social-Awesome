@@ -1,5 +1,7 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,23 +9,35 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import cmpe.sjsu.socialawesome.Utils.DbUtils;
+import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.InMailMessage;
 import cmpe.sjsu.socialawesome.models.User;
+
+import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
 /**
  * Created by lam on 5/19/17.
  */
 
 public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.ViewHolder> {
+    final DatabaseReference mSelfRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
+            .child(UserAuth.getInstance().getCurrentUser().id).child(User.IN_MAIL);
+
     private List<InMailMessage> mailMessages;
+    private OnInMailMessageChangeListener mChangeListener;
     private OnInMailMessageClickListener mListener;
 
-    public InMailListAdapter(List<InMailMessage> messages, OnInMailMessageClickListener listener) {
+    public InMailListAdapter(List<InMailMessage> messages, OnInMailMessageClickListener listener, OnInMailMessageChangeListener changeListener) {
         mailMessages = messages;
         mListener = listener;
+        mChangeListener = changeListener;
     }
 
     @Override
@@ -42,6 +56,13 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
                 holder.mSubjectEt.setText(message.subject);
                 holder.mTimestampEt.setText(message.lastTimeStamp);
                 holder.mSendRcv.setText(message.self ? holder.mRootView.getContext().getString(R.string.sent) : holder.mRootView.getContext().getString(R.string.received));
+
+                if (user.profilePhotoURL != null) {
+                    Picasso.with(holder.mUserImage.getContext()).load(user.profilePhotoURL).into(holder.mUserImage);
+                } else {
+                    String defaultURL = holder.mUserImage.getContext().getResources().getString(R.string.default_profile_pic);
+                    Picasso.with(holder.mUserImage.getContext()).load(defaultURL).into(holder.mUserImage);
+                }
             }
         });
 
@@ -53,6 +74,32 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
                 }
             }
         });
+
+        holder.mRootView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                new AlertDialog.Builder(holder.mRootView.getContext())
+                        .setTitle(R.string.delete)
+                        .setMessage(R.string.delete_in_mail_message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mSelfRef.child(message.id).removeValue();
+                                if (mChangeListener != null) {
+                                    mChangeListener.onChanged();
+                                }
+                                dialog.dismiss();
+                            }
+                        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                        .create().show();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -62,6 +109,10 @@ public class InMailListAdapter extends RecyclerView.Adapter<InMailListAdapter.Vi
 
     interface OnInMailMessageClickListener {
         void onClicked(String messageId);
+    }
+
+    interface OnInMailMessageChangeListener {
+        void onChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

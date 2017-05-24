@@ -104,12 +104,31 @@ public class SettingFragment extends SocialFragment {
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment fragment = new ProfileFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.content_frame, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+//                Fragment fragment = new ProfileFragment();
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.content_frame, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
+
+                //        List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
+//        HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
+//
+//        tokens = Arrays.asList("lam.tran@sjsu.edu");
+//        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
+
+                Intent intent = new Intent(getActivity(), InMailActivity.class);
+                intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_LIST);
+//        UserSummary summary = new UserSummary();
+//        summary.email = "lamtran91@gmail.com";
+//        summary.id = "nEKXWvqoroRjtFqLd9c3Z3ZF3Bi2";
+
+//        UserSummary summary = new UserSummary();
+//        summary.email = "lam.tran@sjsu.edu";
+//        summary.id = "NavUTJHA91azs7Un6iA69VDf7JX2";
+//        intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, summary);
+
+                startActivity(intent);
             }
         });
 

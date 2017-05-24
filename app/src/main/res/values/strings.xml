@@ -41,4 +41,9 @@
 
     <string name="verify_account">Account Verified</string>
 
+    <!--Dialog Message-->
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_in_mail_message">Delete in mail message?</string>
+
 </resources>

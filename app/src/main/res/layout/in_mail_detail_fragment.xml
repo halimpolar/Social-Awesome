@@ -10,12 +10,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/userImage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@android:mipmap/sym_def_app_icon" />
-
         <EditText
             android:id="@+id/userName"
             android:layout_width="match_parent"
