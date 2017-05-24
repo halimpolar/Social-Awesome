@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction transaction = fm.beginTransaction();
                     transaction.replace(R.id.content_frame, fragment);
                     transaction.commit();
+                    mDrawerLayout.closeDrawers();
                 }
             }
         });
