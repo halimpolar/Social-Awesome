@@ -25,21 +25,10 @@
             android:textSize="14dp" />
 
         <TextView
-            android:id="@+id/profileNickName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileName"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:text="Nick Name:  "
-            android:textSize="12dp" />
-
-        <TextView
             android:id="@+id/profileEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profileNickName"
+            android:layout_below="@id/profileName"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp"
             android:gravity="center_vertical"
@@ -57,16 +46,6 @@
             android:text="Location:      "
             android:textSize="12dp" />
 
-        <TextView
-            android:id="@+id/profileProfession"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileLocation"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:text="Profession:   "
-            android:textSize="12dp" />
 
         <ImageView
             android:id="@+id/profileImage"
@@ -78,6 +57,28 @@
             android:layout_marginEnd="10dp"
             android:layout_marginTop="30dp"
             card_view:srcCompat="@android:drawable/sym_def_app_icon" />
+
+        <Button
+            android:id="@+id/accept_request_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/profileLocation"
+            android:layout_marginLeft="5dp"
+            android:gravity="center_vertical"
+            android:text="Accept"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/add_select_friend_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/accept_request_button"
+            android:layout_marginStart="15dp"
+            android:layout_toEndOf="@+id/accept_request_button"
+            android:text="Add Friend"
+            android:visibility="gone" />
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

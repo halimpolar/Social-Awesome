@@ -45,15 +45,9 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
                 holder.vName.setText(user.first_name + " " + user.last_name);
                 holder.vEmail.setText("Email:            " + user.email);
                 holder.vLocation.setText("Location:      " + user.location);
-                holder.vProfession.setText("Profession:   " + user.profession);
             }
         });
 
-//        holder.vName.setText(user.first_name + " " + user.last_name);
-//        holder.vNickName.setText("Nick Name:  " + user.nick_name);
-//        holder.vEmail.setText("Email:            " + user.email);
-//        holder.vLocation.setText("Location:      " + user.location);
-//        holder.vProfession.setText("Profession:   " + user.profession);
         //TODO: setimageurl: http://stackoverflow.com/questions/2471935/how-to-load-an-imageview-by-url-in-android
 
     }
@@ -66,19 +60,20 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
     public static class FriendViewHolder extends RecyclerView.ViewHolder {
         protected TextView vName;
         protected TextView vEmail;
-        protected TextView vNickName;
         protected TextView vLocation;
-        protected TextView vProfession;
 
         public FriendViewHolder(View v) {
             super(v);
             vName =  (TextView) v.findViewById(R.id.profileName);
             vEmail = (TextView) v.findViewById(R.id.profileEmail);
-            vNickName = (TextView) v.findViewById(R.id.profileNickName);
             vLocation = (TextView) v.findViewById(R.id.profileLocation);
-            vProfession = (TextView) v.findViewById(R.id.profileProfession);
 
         }
+    }
+
+    public void updateList(List<String> newList) {
+        entryList = newList;
+        notifyDataSetChanged();
     }
 
 //    public void addItem(CalendarEvent event) {

@@ -101,6 +101,7 @@ public class FriendUtils {
                     }
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -154,18 +155,19 @@ public class FriendUtils {
                             Toast.makeText(context, "Error: " + dialogDuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
                         } else {
                             UserIDMap idMap = new UserIDMap();
-                            idMap.id =  user.id;
+                            idMap.id = user.id;
                             currentUserFollowRef.child(user.id).setValue(idMap);
                             followerRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserIdMap());
                             Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
                         }
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
             } else {
-                Toast.makeText(context, "Error: " + dialogPrivate+ "!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Error: " + dialogPrivate + "!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -188,6 +190,7 @@ public class FriendUtils {
                     }
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -235,13 +238,13 @@ public class FriendUtils {
                     followerRef.child(UserAuth.getInstance().getCurrentUser().id).removeValue();
                     if (functionType == 0) {
                         UserIDMap idMap = new UserIDMap();
-                        idMap.id =  user.id;
+                        idMap.id = user.id;
                         currentUserRef.child(FRIEND_LIST).child(user.id).setValue(idMap);
                         userTableRef.child(user.id).child(FRIEND_LIST).child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getInstance().getCurrentUserIdMap());
                     }
-                    Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!" , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "Error: " + dialogErrorFinal + receiveName + "!" , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Error: " + dialogErrorFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
                 }
             }
 
