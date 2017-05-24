@@ -20,8 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import cmpe.sjsu.socialawesome.Utils.TokenBroadcastReceiver;
@@ -64,9 +63,9 @@ public class StartActivity extends AppCompatActivity {
         mResendVerification = (Button) findViewById(R.id.resend_verification);
         //Fields
         mEmailEt = (EditText) findViewById(R.id.email);
-        mEmailEt.setText("sterling.tarng@sjsu.edu");
+//        mEmailEt.setText("sterling.tarng@sjsu.edu");
         mPasswordEt = (EditText) findViewById(R.id.password);
-        mPasswordEt.setText("Test$123");
+//        mPasswordEt.setText("11111");
         mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);
@@ -207,13 +206,13 @@ public class StartActivity extends AppCompatActivity {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
         if (fbUser.isEmailVerified()) {
 
-            ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
+            ref.child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public Transaction.Result doTransaction(MutableData mutableData) {
-                    User user = mutableData.getValue(User.class);
-                    if (user != null) {
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue() != null) {
+                        User user = dataSnapshot.getValue(User.class);
 
-                        if (token != null && !token.equals(user.token)) {
+                        if (user != null && token != null && !token.equals(user.token)) {
                             user.token = token;
                             ref.child(fbUser.getUid()).child("token").setValue(token);
                         }
@@ -221,32 +220,67 @@ public class StartActivity extends AppCompatActivity {
                         UserAuth.getInstance().setCurrentUser(user);
                         launchMainActivity();
                     } else {
-                        user = new User();
+                        User user = new User();
                         user.id = fbUser.getUid();
                         user.email = fbUser.getEmail();
                         user.first_name = mFirstNameEt.getText().toString();
                         user.last_name = mLastNameEt.getText().toString();
                         user.token = token;
 
-                        Task task = ref.child(fbUser.getUid()).setValue(user);
+                        ref.child(fbUser.getUid()).setValue(user);
+                        UserAuth.getInstance().setCurrentUser(user);
+                        launchMainActivity();
+                        Log.d(TAG, "Successfully create user in db");
 
-                        if (!task.isSuccessful()) {
-                            //TODO: show text fail to save user to db
-                            Log.e(TAG, "Fail to save user to db");
-                        } else {
-                            UserAuth.getInstance().setCurrentUser(user);
-                            launchMainActivity();
-                            Log.d(TAG, "Successfully create user in db");
-                        }
                     }
-                    return Transaction.success(mutableData);
                 }
 
                 @Override
-                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                public void onCancelled(DatabaseError databaseError) {
+
                 }
             });
+
+//            ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
+//                @Override
+//                public Transaction.Result doTransaction(MutableData mutableData) {
+//                    if (mutableData.getValue() != null) {
+//                        User user = mutableData.getValue(User.class);
+//
+//                        if (user != null && token != null && !token.equals(user.token)) {
+//                            user.token = token;
+//                            ref.child(fbUser.getUid()).child("token").setValue(token);
+//                        }
+//
+//                        UserAuth.getInstance().setCurrentUser(user);
+//                        launchMainActivity();
+//                    } else {
+//                        User user = new User();
+//                        user.id = fbUser.getUid();
+//                        user.email = fbUser.getEmail();
+//                        user.first_name = mFirstNameEt.getText().toString();
+//                        user.last_name = mLastNameEt.getText().toString();
+//                        user.token = token;
+//
+//                        Task task = ref.child(fbUser.getUid()).setValue(user);
+//
+//                        if (!task.isSuccessful()) {
+//                            //TODO: show text fail to save user to db
+//                            Log.e(TAG, "Fail to save user to db");
+//                        } else {
+//                            UserAuth.getInstance().setCurrentUser(user);
+//                            launchMainActivity();
+//                            Log.d(TAG, "Successfully create user in db");
+//                        }
+//                    }
+//                    return Transaction.success(mutableData);
+//                }
+//
+//                @Override
+//                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+//                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+//                }
+//            });
 
         } else {
             Toast.makeText(StartActivity.this, "Account is not Verified",
