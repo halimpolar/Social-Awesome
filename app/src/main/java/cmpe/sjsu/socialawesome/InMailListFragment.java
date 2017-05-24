@@ -19,20 +19,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
+import cmpe.sjsu.socialawesome.models.InMailMessage;
 import cmpe.sjsu.socialawesome.models.User;
-import cmpe.sjsu.socialawesome.models.UserSummary;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
 /**
  * Created by lam on 4/28/17.
  */
-public class PrivateMessageListFragment extends SocialFragment {
+public class InMailListFragment extends SocialFragment {
     final DatabaseReference mSelfRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
-            .child(UserAuth.getInstance().getCurrentUser().id).child(User.PRIVATE_MESSAGE);
+            .child(UserAuth.getInstance().getCurrentUser().id).child(User.IN_MAIL);
     private RecyclerView mListView;
-    private List<UserSummary> mSummaryList = new ArrayList<>();
-    private MessageListAdapter mAdapter;
+    private List<InMailMessage> inMailMessages = new ArrayList<>();
+    private InMailListAdapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,12 +49,12 @@ public class PrivateMessageListFragment extends SocialFragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         mListView.setLayoutManager(llm);
 
-        mAdapter = new MessageListAdapter(mSummaryList, new MessageListAdapter.OnMessageChatClickListener() {
+        mAdapter = new InMailListAdapter(inMailMessages, new InMailListAdapter.OnInMailMessageClickListener() {
             @Override
-            public void onClicked(UserSummary user) {
-                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
-                intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
-                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, user);
+            public void onClicked(String messageId) {
+                Intent intent = new Intent(getActivity(), InMailActivity.class);
+                intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_DETAIL);
+                intent.putExtra(InMailActivity.BUNDLE_MESSAGE_ID, messageId);
                 startActivity(intent);
             }
         });
@@ -72,10 +72,10 @@ public class PrivateMessageListFragment extends SocialFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                mSummaryList.clear();
+                inMailMessages.clear();
                 for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
-                    UserSummary summary = messageSnapshot.getValue(UserSummary.class);
-                    mSummaryList.add(summary);
+                    InMailMessage message = messageSnapshot.getValue(InMailMessage.class);
+                    inMailMessages.add(message);
                 }
                 mAdapter.notifyDataSetChanged();
             }

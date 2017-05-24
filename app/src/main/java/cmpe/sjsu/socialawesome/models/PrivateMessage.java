@@ -9,8 +9,9 @@ import java.util.Map;
  */
 @IgnoreExtraProperties
 public class PrivateMessage {
+    public static final String MESSAGES = "messages";
     public UserSummary user;
     public String lastTimeStamp;
     public String title;
-    public Map<String, String> messages;
+    public Map<String, SingleMessage> messages;
 }

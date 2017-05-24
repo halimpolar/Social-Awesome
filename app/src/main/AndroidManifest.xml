@@ -30,8 +30,15 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main" />
         <activity
+            android:name=".InMailActivity"
+            android:label="In Mail" />
+        <activity
             android:name=".PrivateMessageActivity"
-            android:label="@string/title_activity_main" />
+            android:label="Instant chat" />
+
+        <activity
+            android:name=".CreatePostActivity"
+            android:label="@string/title_activity_post" />
 
         <service android:name=".services.SocialMessageService">
             <intent-filter>

@@ -8,12 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -29,12 +27,27 @@ import static cmpe.sjsu.socialawesome.models.User.FRIEND_LIST;
  * A placeholder fragment containing a simple view.
  */
 public class FriendFragment extends SocialFragment {
+    private static ArrayList<UserSummary> mFriendList = new ArrayList<>();
     private RecyclerView recList;
     private FriendListAdapter mAdapter;
-    private static ArrayList<UserSummary> mFriendList = new ArrayList<>();
 
     public FriendFragment() {
         mTitle = FriendFragment.class.getSimpleName();
+    }
+
+    private static void addFriendList(UserSummary userSummary) {
+        mFriendList.add(userSummary);
+    }
+
+    private static UserSummary getUserSummary(User user) {
+        UserSummary userSummary = new UserSummary();
+        userSummary.id = user.id;
+        userSummary.email = user.email;
+        userSummary.first_name = user.first_name;
+        userSummary.last_name = user.last_name;
+        userSummary.profilePhotoURL = user.profilePhotoURL;
+        userSummary.status = user.status;
+        return userSummary;
     }
 
     @Override
@@ -69,7 +82,7 @@ public class FriendFragment extends SocialFragment {
         friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     UserSummary userSummary = postSnapshot.getValue(UserSummary.class);
 //                UserSummary userSummary = getUserSummary(user);
                     mFriendList.add(userSummary);
@@ -87,7 +100,7 @@ public class FriendFragment extends SocialFragment {
             }
         });
 
-//        Query query = friendRef.orderByChild("last_name");
+//        Query query = mSelfRef.orderByChild("last_name");
 //        query.addChildEventListener(new ChildEventListener() {
 //            @Override
 //            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -118,21 +131,6 @@ public class FriendFragment extends SocialFragment {
 //            }
 //        });
 //        mFriendList.add(UserAuth.getCurrentUserSummary());
-    }
-
-    private static void addFriendList(UserSummary userSummary) {
-        mFriendList.add(userSummary);
-    }
-
-    private static UserSummary getUserSummary(User user) {
-        UserSummary userSummary = new UserSummary();
-        userSummary.id = user.id;
-        userSummary.email = user.email;
-        userSummary.first_name = user.first_name;
-        userSummary.last_name = user.last_name;
-        userSummary.profilePhotoURL = user.profilePhotoURL;
-        userSummary.status = user.status;
-        return userSummary;
     }
 
 }

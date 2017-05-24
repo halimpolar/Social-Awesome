@@ -83,7 +83,7 @@ public class SettingFragment extends SocialFragment {
             }
         });
 
-        /*radioGroup2.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        radioGroup2.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 mAuth = FirebaseAuth.getInstance();
@@ -98,7 +98,7 @@ public class SettingFragment extends SocialFragment {
                         break;
                 }
             }
-        });*/
+        });
 
 
         backBtn.setOnClickListener(new View.OnClickListener() {

@@ -7,13 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import cmpe.sjsu.socialawesome.models.UserSummary;
-
-public class PrivateMessageActivity extends AppCompatActivity {
+public class InMailActivity extends AppCompatActivity {
     public static final String ACTION_LIST = "open_list_message";
     public static final String ACTION_DETAIL = "open_new_message";
     public static final String ACTION_EXTRA = "open_new_message";
-    public static final String BUNDLE_OTHER_USER = "bundle_other_user";
+    public static final String BUNDLE_MESSAGE_ID = "bundle_message_id";
 
     private SocialFragment mFragment;
 
@@ -28,21 +26,23 @@ public class PrivateMessageActivity extends AppCompatActivity {
         }
 
         if (getIntent() != null && !TextUtils.isEmpty(getIntent().getStringExtra(ACTION_EXTRA))) {
-            UserSummary otherUser = (UserSummary) getIntent().getSerializableExtra(BUNDLE_OTHER_USER);
+//            UserSummary otherUser = (UserSummary) getIntent().getSerializableExtra(BUNDLE_OTHER_USER);
             switch (getIntent().getStringExtra(ACTION_EXTRA)) {
                 case ACTION_LIST:
-                    mFragment = new PrivateMessageListFragment();
+                    mFragment = new InMailListFragment();
                     break;
                 case ACTION_DETAIL:
-                    mFragment = new PrivateMessageChatFragment();
+                    mFragment = new InMailDetailFragment();
                     break;
                 default:
                     break;
             }
 
-            Bundle bundle = new Bundle(1);
-            bundle.putSerializable(PrivateMessageChatFragment.OTHER_USER_BUNDLE, otherUser);
-            mFragment.setArguments(bundle);
+            if (getIntent().getStringExtra(BUNDLE_MESSAGE_ID) != null) {
+                Bundle bundle = new Bundle(1);
+                bundle.putString(BUNDLE_MESSAGE_ID, getIntent().getStringExtra(BUNDLE_MESSAGE_ID));
+                mFragment.setArguments(bundle);
+            }
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction transaction = fm.beginTransaction();
