@@ -11,10 +11,11 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import cmpe.sjsu.socialawesome.Utils.DbUtils;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.SingleMessage;
 import cmpe.sjsu.socialawesome.models.User;
-import cmpe.sjsu.socialawesome.models.UserSummary;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 
 /**
  * Created by lam on 5/19/17.
@@ -22,26 +23,43 @@ import cmpe.sjsu.socialawesome.models.UserSummary;
 
 public class MessageChatAdapter extends RecyclerView.Adapter<MessageChatAdapter.ViewHolder> {
     private List<SingleMessage> mMessages;
-    private UserSummary mUser;
+    private UserIDMap mUser;
     private User mCurrentUser;
 
-    public MessageChatAdapter(List<SingleMessage> messages, UserSummary userSummary) {
+    public MessageChatAdapter(List<SingleMessage> messages, UserIDMap userIDMap) {
         mMessages = messages;
-        mUser = userSummary;
+        mUser = userIDMap;
         mCurrentUser = UserAuth.getInstance().getCurrentUser();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.private_chat_message, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(viewType == 1 ? R.layout.private_chat_message : R.layout.private_chat_message_self, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        SingleMessage message = mMessages.get(position);
-        holder.mTextContent.setText(message.message);
-        holder.mUserName.setText(message.isSelf ? mCurrentUser.email : mUser.email);
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        final SingleMessage message = mMessages.get(position);
+        DbUtils.executeById(holder.mTextContent.getContext(), mUser.id, new DbUtils.OnQueryDbListener() {
+            @Override
+            public void execute(User user) {
+                holder.mTextContent.setText(message.message);
+                holder.mUserName.setText(message.isSelf ? mCurrentUser.email : user.email);
+                if (user.profilePhotoURL != null) {
+                    Picasso.with(holder.mUserImage.getContext()).
+                            load(user.profilePhotoURL).into(holder.mUserImage);
+                } else {
+                    String defaultURL = holder.mUserImage.getContext().getResources().getString(R.string.default_profile_pic);
+                    Picasso.with(holder.mUserImage.getContext()).load(defaultURL).into(holder.mUserImage);
+                }
+            }
+        });
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mMessages.get(position).isSelf ? 0 : 1;
     }
 
     @Override

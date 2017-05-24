@@ -2,14 +2,6 @@ package cmpe.sjsu.socialawesome;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.IdRes;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-
-import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
-import cmpe.sjsu.socialawesome.models.User;
-import cmpe.sjsu.socialawesome.models.UserSummary;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -55,7 +46,7 @@ public class SettingFragment extends SocialFragment {
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
         radio_private = (RadioButton) view.findViewById(R.id.radio_private);
         radio_public = (RadioButton) view.findViewById(R.id.radio_public);
-        radio_friend= (RadioButton) view.findViewById(R.id.radio_friend);
+        radio_friend = (RadioButton) view.findViewById(R.id.radio_friend);
         radio_yes = (RadioButton) view.findViewById(R.id.radio_yes);
         radio_no = (RadioButton) view.findViewById(R.id.radio_no);
         radioGroup1 = (RadioGroup) view.findViewById(R.id.radioGroup1);
@@ -66,18 +57,18 @@ public class SettingFragment extends SocialFragment {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 mAuth = FirebaseAuth.getInstance();
-                switch(checkedId) {
+                switch (checkedId) {
                     case R.id.radio_private:
                         mFirebaseDatabase.child("status").setValue(0);
-                        Toast.makeText(getActivity(), "Profile Set to Private",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Profile Set to Private", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.radio_public:
                         mFirebaseDatabase.child("status").setValue(1);
-                        Toast.makeText(getActivity(), "Profile Set to Public",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Profile Set to Public", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.radio_friend:
                         mFirebaseDatabase.child("status").setValue(2);
-                        Toast.makeText(getActivity(), "Profile Set to Friend Only",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Profile Set to Friend Only", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -87,14 +78,14 @@ public class SettingFragment extends SocialFragment {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 mAuth = FirebaseAuth.getInstance();
-                switch(checkedId) {
+                switch (checkedId) {
                     case R.id.radio_yes:
                         mFirebaseDatabase.child("notification").setValue(true);
-                        Toast.makeText(getActivity(), "Email Notification Set",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Email Notification Set", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.radio_no:
                         mFirebaseDatabase.child("notification").setValue(false);
-                        Toast.makeText(getActivity(), "No Email Notification",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "No Email Notification", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -141,6 +132,27 @@ public class SettingFragment extends SocialFragment {
             }
         });
 
+        view.findViewById(R.id.new_chat).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
+                intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
+                UserIDMap id = new UserIDMap();
+                id.id = "NavUTJHA91azs7Un6iA69VDf7JX2";
+                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, id);
+                startActivity(intent);
+            }
+        });
+
+        view.findViewById(R.id.private_chat).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
+                intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_LIST);
+                startActivity(intent);
+            }
+        });
+
 
         return view;
 
@@ -183,9 +195,9 @@ public class SettingFragment extends SocialFragment {
 
 }
 
- //   @Override
- //   public void onStart() {
- //       super.onStart();
+//   @Override
+//   public void onStart() {
+//       super.onStart();
 //        List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
 //        HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
 //

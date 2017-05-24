@@ -7,19 +7,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
-import cmpe.sjsu.socialawesome.models.UserSummary;
+import cmpe.sjsu.socialawesome.Utils.DbUtils;
+import cmpe.sjsu.socialawesome.models.User;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 
 /**
  * Created by lam on 5/19/17.
  */
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder> {
-    private List<UserSummary> mUsers;
+    private List<UserIDMap> mUsers;
     private OnMessageChatClickListener mListener;
 
-    public MessageListAdapter(List<UserSummary> summaries, OnMessageChatClickListener listener) {
+    public MessageListAdapter(List<UserIDMap> summaries, OnMessageChatClickListener listener) {
         mUsers = summaries;
         mListener = listener;
     }
@@ -31,17 +35,31 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        final UserSummary user = mUsers.get(position);
-        holder.mUserName.setText(user.email);
-        holder.mRootView.setOnClickListener(new View.OnClickListener() {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        final UserIDMap user = mUsers.get(position);
+        DbUtils.executeById(holder.mRootView.getContext(), user.id, new DbUtils.OnQueryDbListener() {
             @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClicked(user);
+            public void execute(final User user) {
+                if (user == null) return;
+                if (user.profilePhotoURL != null) {
+                    Picasso.with(holder.mUserImage.getContext()).
+                            load(user.profilePhotoURL).into(holder.mUserImage);
+                } else {
+                    String defaultURL = holder.mUserImage.getContext().getResources().getString(R.string.default_profile_pic);
+                    Picasso.with(holder.mUserImage.getContext()).load(defaultURL).into(holder.mUserImage);
                 }
+                holder.mUserName.setText(user.email);
+                holder.mRootView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mListener != null) {
+                            mListener.onClicked(user);
+                        }
+                    }
+                });
             }
         });
+
     }
 
     @Override
@@ -50,7 +68,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     interface OnMessageChatClickListener {
-        void onClicked(UserSummary user);
+        void onClicked(User user);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -25,7 +25,7 @@ import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.PrivateMessage;
 import cmpe.sjsu.socialawesome.models.SingleMessage;
 import cmpe.sjsu.socialawesome.models.User;
-import cmpe.sjsu.socialawesome.models.UserSummary;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
@@ -44,7 +44,7 @@ public class PrivateMessageChatFragment extends SocialFragment {
     private Button mSendButton;
     private List<SingleMessage> messages = new ArrayList<>();
     private MessageChatAdapter mAdapter;
-    private UserSummary mOtherUser;
+    private UserIDMap mOtherUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,8 +87,8 @@ public class PrivateMessageChatFragment extends SocialFragment {
             }
         });
 
-        if (getArguments().getSerializable(OTHER_USER_BUNDLE) instanceof UserSummary) {
-            mOtherUser = (UserSummary) getArguments().getSerializable(OTHER_USER_BUNDLE);
+        if (getArguments().getSerializable(OTHER_USER_BUNDLE) instanceof UserIDMap) {
+            mOtherUser = (UserIDMap) getArguments().getSerializable(OTHER_USER_BUNDLE);
             mOtherRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
                     .child(mOtherUser.id).child(User.PRIVATE_MESSAGE);
             mAdapter = new MessageChatAdapter(messages, mOtherUser);
@@ -106,16 +106,6 @@ public class PrivateMessageChatFragment extends SocialFragment {
         mSelfRef.child(mOtherUser.id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getChildren() == null) {
-                    mSelfRef.child(mOtherUser.id).setValue(mOtherUser);
-                    if (mOtherRef != null)
-                        mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserSummary());
-                } else {
-                    mSelfRef.child(mOtherUser.id).updateChildren(mOtherUser.toMap());
-                    if (mOtherRef != null)
-                        mOtherRef.child(UserAuth.getInstance().getCurrentUser().id).updateChildren(UserAuth.getCurrentUserSummary().toMap());
-                }
-
                 messages.clear();
                 for (DataSnapshot messageSnapshot : dataSnapshot.child(PrivateMessage.MESSAGES).getChildren()) {
                     SingleMessage message = messageSnapshot.getValue(SingleMessage.class);

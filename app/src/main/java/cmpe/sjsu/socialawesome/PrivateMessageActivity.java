@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 import cmpe.sjsu.socialawesome.models.UserSummary;
 
 public class PrivateMessageActivity extends AppCompatActivity {
@@ -28,7 +29,7 @@ public class PrivateMessageActivity extends AppCompatActivity {
         }
 
         if (getIntent() != null && !TextUtils.isEmpty(getIntent().getStringExtra(ACTION_EXTRA))) {
-            UserSummary otherUser = (UserSummary) getIntent().getSerializableExtra(BUNDLE_OTHER_USER);
+            UserIDMap otherUser = (UserIDMap) getIntent().getSerializableExtra(BUNDLE_OTHER_USER);
             switch (getIntent().getStringExtra(ACTION_EXTRA)) {
                 case ACTION_LIST:
                     mFragment = new PrivateMessageListFragment();

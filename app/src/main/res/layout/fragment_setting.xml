@@ -65,12 +65,24 @@
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back" />
+        android:text="In Mail List" />
 
     <Button
         android:id="@+id/inmail_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="new InMail" />
+
+    <Button
+        android:id="@+id/private_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chat List" />
+
+    <Button
+        android:id="@+id/new_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="new Chat" />
 
 </RadioGroup>

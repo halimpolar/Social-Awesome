@@ -2,13 +2,14 @@ package cmpe.sjsu.socialawesome.models;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created by lam on 4/27/17.
  */
 @IgnoreExtraProperties
-public class User {
+public class User implements Serializable {
     public static final String TOKEN = "token";
     public static final String PRIVATE_MESSAGE = "privateMessage";
     public static final String IN_MAIL = "inMail";
