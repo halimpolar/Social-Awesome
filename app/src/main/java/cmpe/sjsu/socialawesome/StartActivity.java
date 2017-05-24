@@ -225,6 +225,8 @@ public class StartActivity extends AppCompatActivity {
                         user.email = fbUser.getEmail();
                         user.first_name = mFirstNameEt.getText().toString();
                         user.last_name = mLastNameEt.getText().toString();
+                        user.status = 1;
+                        user.notification = true;
                         user.token = token;
 
                         ref.child(fbUser.getUid()).setValue(user);
