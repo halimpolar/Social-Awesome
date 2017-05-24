@@ -44,6 +44,9 @@ public class ProfileFragment extends SocialFragment {
     private DatabaseReference mFirebaseDatabase;
     String userId;
 
+    private String currentUserId;
+    private MainActivity activity;
+
     public ProfileFragment()  {
         mTitle = ProfileFragment.class.getSimpleName();
     }
@@ -67,6 +70,12 @@ public class ProfileFragment extends SocialFragment {
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
         mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
 
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mEditBtn.setVisibility(View.VISIBLE);
         mFirstNameEt.setVisibility(View.GONE);
         mLastNameEt.setVisibility(View.GONE);
@@ -113,10 +122,16 @@ public class ProfileFragment extends SocialFragment {
             }
         });
 
-
+        activity = (MainActivity) getActivity();
+        if (activity.isOtherUser && activity.otherUserId != null) {
+            currentUserId = activity.otherUserId;
+        } else {
+            currentUserId = UserAuth.getInstance().getCurrentUser().id;
+        }
 
         //mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference()
+                .child(StartActivity.USERS_TABLE).child(currentUserId);
 
 
         mFirebaseDatabase.runTransaction(new Transaction.Handler() {
@@ -187,7 +202,6 @@ public class ProfileFragment extends SocialFragment {
             }
 
         });
-        return view;
     }
 
     private void populateInfoIntoEditText(User user) {

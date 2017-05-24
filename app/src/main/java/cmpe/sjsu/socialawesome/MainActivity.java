@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
+import cmpe.sjsu.socialawesome.models.User;
+
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -32,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private SocialFragment mCurrentFragment;
+
+    public String otherUserId = null;
+    public boolean isOtherUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
                         //Profile
                         title = getString(R.string.profile);
+                        isOtherUser = false;
                         fragment = new ProfileFragment();
                         break;
                     case 2:
