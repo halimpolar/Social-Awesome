@@ -45,6 +45,37 @@
             android:text="Following Friends"
             android:textSize="14sp" />
 
+        <LinearLayout
+            android:id="@+id/add_email_friend_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/addFriendByEmailTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Friend by Email:" />
+
+            <EditText
+                android:id="@+id/email_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="email"
+                android:inputType="textEmailAddress"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/add_email_friend_btn"
+                android:layout_width="250dp"
+                android:layout_height="35dp"
+                android:text="Add Friend"
+                android:textSize="14sp" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

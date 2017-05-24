@@ -48,9 +48,9 @@ public class FriendUtils {
                             emailFriendRequest(context, email, UserAuth.getInstance().getCurrentUser());
                         }
                     }).start();
-                    UserSummary newUserSummary = new UserSummary();
-                    newUserSummary.email = email;
-                    userTableRef.child(UserAuth.getInstance().getCurrentUser().id).child(WAITING_FRIEND_LIST).push().setValue(newUserSummary);
+                    Toast.makeText(context, "Succes: friend request sent to " + email, Toast.LENGTH_SHORT).show();
+                    //TODO: add email to waiting friend list
+                    userTableRef.child(UserAuth.getInstance().getCurrentUser().id).child(WAITING_FRIEND_LIST).push().setValue(email);
                 } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);
@@ -150,24 +150,58 @@ public class FriendUtils {
                 final String dialogDuFinal = dialogDuplicate;
                 final String dialogSuFinal = dialogSuccess;
 
-                currentUserFollowRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child(user.id).exists()) {
-                            Toast.makeText(context, "Error: " + dialogDuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            UserIDMap idMap = new UserIDMap();
-                            idMap.id = user.id;
-                            currentUserFollowRef.child(user.id).setValue(idMap);
-                            followerRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserIdMap());
-                            Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                if (type == 1) {
+                    currentUserRef.child(FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(user.id).exists()) {
+                                Toast.makeText(context, "Error: " + "You are already friend with " + receiveName + ", no need to follow" + "!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                currentUserFollowRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.child(user.id).exists()) {
+                                            Toast.makeText(context, "Error: " + dialogDuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            UserIDMap idMap = new UserIDMap();
+                                            idMap.id = user.id;
+                                            currentUserFollowRef.child(user.id).setValue(idMap);
+                                            followerRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserIdMap());
+                                            Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                } else {
+                    currentUserFollowRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(user.id).exists()) {
+                                Toast.makeText(context, "Error: " + dialogDuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                UserIDMap idMap = new UserIDMap();
+                                idMap.id = user.id;
+                                currentUserFollowRef.child(user.id).setValue(idMap);
+                                followerRef.child(UserAuth.getInstance().getCurrentUser().id).setValue(UserAuth.getCurrentUserIdMap());
+                                Toast.makeText(context, "Success: " + dialogSuFinal + receiveName + "!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
             } else {
                 Toast.makeText(context, "Error: " + dialogPrivate + "!", Toast.LENGTH_SHORT).show();
             }

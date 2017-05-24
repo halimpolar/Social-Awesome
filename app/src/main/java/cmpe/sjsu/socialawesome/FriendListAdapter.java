@@ -7,22 +7,30 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Collections;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.List;
 
 import cmpe.sjsu.socialawesome.Utils.DbUtils;
 import cmpe.sjsu.socialawesome.Utils.FriendUtils;
+import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.User;
-import cmpe.sjsu.socialawesome.models.UserSummary;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 
-import static android.R.id.message;
+import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
+import static cmpe.sjsu.socialawesome.models.User.FOLOWING_FRIEND_LIST;
+import static cmpe.sjsu.socialawesome.models.User.FRIEND_LIST;
+import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
 
 /**
  * Created by bing on 5/13/17.
  */
 
 
-public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.FriendViewHolder>{
+public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendViewHolder> {
     private List<String> entryList;
     private int mType = 0;
 
@@ -51,7 +59,7 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
                 holder.vEmail.setText("Email:            " + user.email);
                 holder.vLocation.setText("Location:      " + user.location);
 
-                switch (mType){
+                switch (mType) {
                     case 2:
                         holder.acceptReqBtn.setVisibility(View.VISIBLE);
                         break;
@@ -66,12 +74,58 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
                     default:
                 }
 
-                holder.acceptReqBtn.setOnClickListener(new View.OnClickListener(){
+                if (mType == 3) {
+                    FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                            .child(FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(user.id).exists()) {
+                                holder.addSelFriendBtn.setVisibility(View.GONE);
+                                holder.acceptReqBtn.setText("Friends");
+                                holder.acceptReqBtn.setClickable(false);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                    FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                            .child(WAITING_FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(user.id).exists()) {
+                                holder.addSelFriendBtn.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                    FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                            .child(FOLOWING_FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(user.id).exists()) {
+                                holder.acceptReqBtn.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
+
+                holder.acceptReqBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        switch (mType){
+                        switch (mType) {
                             case 2:
                                 FriendUtils.unFollowFriend(holder.vEmail.getContext(), 0, user.id);
+                                holder.acceptReqBtn.setText("Accepted");
+                                holder.acceptReqBtn.setClickable(false);
                                 break;
                             case 3:
                                 FriendUtils.addFriend(holder.vEmail.getContext(), 1, user.id);
@@ -87,19 +141,21 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
                     }
                 });
 
-                holder.addSelFriendBtn.setOnClickListener(new View.OnClickListener(){
+                holder.addSelFriendBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        FriendUtils.addFriend(holder.vEmail.getContext(),0, user.id);
+                        FriendUtils.addFriend(holder.vEmail.getContext(), 0, user.id);
+                        holder.addSelFriendBtn.setText("Adding");
+                        holder.addSelFriendBtn.setClickable(false);
                     }
                 });
 
-                holder.mRootView.setOnClickListener(new View.OnClickListener(){
+                holder.mRootView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         String otherUserId = user.id;
                         Boolean isOtherUser = false;
-                        //TODO:
+                        //TODO: switch fragment and set value
                     }
                 });
             }
@@ -123,7 +179,7 @@ public class FriendListAdapter extends RecyclerView.Adapter <FriendListAdapter.F
 
         public FriendViewHolder(View v) {
             super(v);
-            vName =  (TextView) v.findViewById(R.id.profileName);
+            vName = (TextView) v.findViewById(R.id.profileName);
             vEmail = (TextView) v.findViewById(R.id.profileEmail);
             vLocation = (TextView) v.findViewById(R.id.profileLocation);
             acceptReqBtn = (Button) v.findViewById(R.id.accept_request_button);

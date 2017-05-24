@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -63,6 +64,8 @@ public class FriendFragment extends SocialFragment {
         mAdapter = new FriendListAdapter(mFriendList);
         recList.setAdapter(mAdapter);
 
+        final View addFriendByEmailView = view.findViewById(R.id.add_email_friend_view);
+
         Button OutRequstBtn = (Button) view.findViewById(R.id.outgoing_friend_request_btn);
         OutRequstBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,8 +106,24 @@ public class FriendFragment extends SocialFragment {
         addFriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFriendByEmailView.setVisibility(View.VISIBLE);
                 mFriendList = new ArrayList<>();
                 getPublicUser();
+            }
+        });
+
+        Button addFriendEmailBtn = (Button) view.findViewById(R.id.add_email_friend_btn);
+        final EditText emailET = (EditText) view.findViewById(R.id.email_editText);
+        addFriendEmailBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = emailET.getText().toString();
+                if (email.isEmpty() || email.length() == 0 || email.equals("") || email == null) {
+                    emailET.setError("Please Enter the email!");
+                } else {
+                    FriendUtils.addFriendByEmail(getActivity(), email);
+                    emailET.setText("");
+                }
             }
         });
 
@@ -133,7 +152,7 @@ public class FriendFragment extends SocialFragment {
                 }
                 mAdapter = new FriendListAdapter(mFriendList);
                 int type = 0;
-                switch(node){
+                switch (node) {
                     case FRIEND_LIST:
                         type = 0;
                         break;
@@ -168,7 +187,9 @@ public class FriendFragment extends SocialFragment {
                 mFriendList = new ArrayList<>();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     User publicUser = postSnapshot.getValue(User.class);
-                    mFriendList.add(publicUser.id);
+                    if (!publicUser.id.equals(UserAuth.getInstance().getCurrentUser().id)) {
+                        mFriendList.add(publicUser.id);
+                    }
                     mAdapter.notifyDataSetChanged();
                 }
                 mAdapter = new FriendListAdapter(mFriendList);
