@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,7 +22,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import cmpe.sjsu.socialawesome.Utils.TokenBroadcastReceiver;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.User;
 
@@ -34,10 +36,15 @@ public class StartActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button mSubmitBtn;
     private EditText mConfirmPasswordEt;
-    private TextView mCreateAccountTv;
+    private Button mCreateAccountTv;
+    private Button mVerifyAccount;
+    private Button mResendVerification;
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
     private boolean mIsLogin = true;
+    private String mCustomToken;
+    private TokenBroadcastReceiver mTokenReceiver;
+
 
     private void launchMainActivity() {
         Intent mainIntent = new Intent(this, MainActivity.class);
@@ -50,7 +57,12 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.start_layout);
         mAuth = FirebaseAuth.getInstance();
 
+        //Buttons
         mSubmitBtn = (Button) findViewById(R.id.submit);
+        mCreateAccountTv = (Button) findViewById(R.id.create_account);
+        mVerifyAccount = (Button) findViewById(R.id.verify_account);
+        mResendVerification = (Button) findViewById(R.id.resend_verification);
+        //Fields
         mEmailEt = (EditText) findViewById(R.id.email);
         mEmailEt.setText("sterling.tarng@sjsu.edu");
         mPasswordEt = (EditText) findViewById(R.id.password);
@@ -58,7 +70,9 @@ public class StartActivity extends AppCompatActivity {
         mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);
-        mCreateAccountTv = (TextView) findViewById(R.id.create_account_text);
+
+        mVerifyAccount.setVisibility(View.GONE);
+        mResendVerification.setVisibility(View.GONE);
 
         mCreateAccountTv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +95,63 @@ public class StartActivity extends AppCompatActivity {
         setupUI(true);
     }
 
+    private void createAccount(String email, String password) {
+        Log.d(TAG, "createAccount:" + email);
+        if (!validate()) {
+            return;
+        }
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //successLogin(mAuth.getCurrentUser());
+                            sendEmailVerification();
+                            updateUI(user);
+
+                            mVerifyAccount.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    sendEmailVerification();
+                                }
+
+                            });
+
+                            mResendVerification.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    sendEmailVerification();
+                                }
+                            });
+
+                            mSubmitBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (!mIsLogin) {
+                                        createAccount(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
+                                    } else {
+                                        signIn(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
+                                    }
+                                }
+                            });
+
+                            setupUI(true);
+
+
+                        } else {
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+
+                            //TODO: show error message onscreen instead of toast
+                            Toast.makeText(StartActivity.this, "You already have an account",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
         if (!validate()) {
@@ -95,6 +166,7 @@ public class StartActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             successLogin(mAuth.getCurrentUser());
+                            setupUI(true);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -107,66 +179,65 @@ public class StartActivity extends AppCompatActivity {
                 });
     }
 
-    private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
-        if (!validate()) {
-            //TODO: show error message
-            return;
+    private boolean validate() {
+        //validate that the field is completed
+        boolean valid = true;
+
+        String email = mEmailEt.getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            mEmailEt.setError("Required.");
+            valid = false;
+        } else {
+            mEmailEt.setError(null);
         }
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "createUserWithEmail:success");
-                            successLogin(mAuth.getCurrentUser());
-
-                        } else {
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-
-                            //TODO: show error message onscreen instead of toast
-                            Toast.makeText(StartActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    private boolean validate() {
-        //TODO: do validation on the input
-        return true;
-    }
-
-    private void successLogin(FirebaseUser fbUser) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
-        if (!mIsLogin) {
-            User user = new User();
-            user.id = fbUser.getUid();
-            user.email = fbUser.getEmail();
-            user.first_name = mFirstNameEt.getText().toString();
-            user.last_name = mLastNameEt.getText().toString();
-
-            Task task = ref.child(fbUser.getUid()).setValue(user);
-
-            if (task.isSuccessful()) {
-                UserAuth.getInstance().setCurrentUser(user);
-//                UserAuth.getInstance().setCurrentUserSummary(user);
-                launchMainActivity();
-                Log.d(TAG, "Successfully create user in db");
-            } else {
-                //TODO: show text fail to save user to db
-                Log.e(TAG, "Fail to save user to db");
-            }
+        String password = mPasswordEt.getText().toString();
+        if (TextUtils.isEmpty(password)) {
+            mPasswordEt.setError("Required.");
+            valid = false;
         } else {
+            mPasswordEt.setError(null);
+        }
+
+        return valid;
+    }
+
+    private void successLogin(final FirebaseUser fbUser) {
+        final String token = FirebaseInstanceId.getInstance().getToken();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
+        if (fbUser.isEmailVerified()) {
+
             ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
                 @Override
                 public Transaction.Result doTransaction(MutableData mutableData) {
                     User user = mutableData.getValue(User.class);
                     if (user != null) {
+
+                        if (token != null && !token.equals(user.token)) {
+                            user.token = token;
+                            ref.child(fbUser.getUid()).child("token").setValue(token);
+                        }
+
                         UserAuth.getInstance().setCurrentUser(user);
-//                        UserAuth.getInstance().setCurrentUserSummary(user);
                         launchMainActivity();
+                    } else {
+                        user = new User();
+                        user.id = fbUser.getUid();
+                        user.email = fbUser.getEmail();
+                        user.first_name = mFirstNameEt.getText().toString();
+                        user.last_name = mLastNameEt.getText().toString();
+                        user.token = token;
+
+                        Task task = ref.child(fbUser.getUid()).setValue(user);
+
+                        if (!task.isSuccessful()) {
+                            //TODO: show text fail to save user to db
+                            Log.e(TAG, "Fail to save user to db");
+                        } else {
+                            UserAuth.getInstance().setCurrentUser(user);
+                            launchMainActivity();
+                            Log.d(TAG, "Successfully create user in db");
+                        }
                     }
                     return Transaction.success(mutableData);
                 }
@@ -176,9 +247,65 @@ public class StartActivity extends AppCompatActivity {
                     Log.d(TAG, "postTransaction:onComplete:" + databaseError);
                 }
             });
+
+        } else {
+            Toast.makeText(StartActivity.this, "Account is not Verified",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
+    // UI before email is verified
+    private void updateUI(FirebaseUser user) {
+        if (user != null) {
+            mFirstNameEt.setVisibility(View.GONE);
+            mLastNameEt.setVisibility(View.GONE);
+            mConfirmPasswordEt.setVisibility(View.GONE);
+            mCreateAccountTv.setVisibility(View.GONE);
+            mSubmitBtn.setVisibility(View.VISIBLE);
+            mVerifyAccount.setVisibility(View.VISIBLE);
+            mResendVerification.setVisibility(View.VISIBLE);
+            mSubmitBtn.setText(getString(R.string.login));
+
+            //successLogin(mAuth.getCurrentUser());
+        } else {
+            successLogin(mAuth.getCurrentUser());
+            //findViewById(R.id.verify_account).setVisibility(View.VISIBLE);
+
+        }
+    }
+
+    private void sendEmailVerification() {
+        // Disable button
+        findViewById(R.id.verify_account).setEnabled(false);
+
+// Send verification email
+// [START send_email_verification]
+        final FirebaseUser user = mAuth.getCurrentUser();
+        user.sendEmailVerification()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // [START_EXCLUDE]
+                        // Re-enable button
+                        findViewById(R.id.verify_account).setEnabled(true);
+
+                        if (task.isSuccessful()) {
+                            Toast.makeText(StartActivity.this,
+                                    "Verification email sent to " + user.getEmail(),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.e(TAG, "sendEmailVerification", task.getException());
+                            Toast.makeText(StartActivity.this,
+                                    "Failed to send verification email.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END send_email_verification]
+    }
+
+    // UI after email is verified
     private void setupUI(boolean isLogin) {
         mIsLogin = isLogin;
         if (isLogin) {
@@ -186,7 +313,7 @@ public class StartActivity extends AppCompatActivity {
             mLastNameEt.setVisibility(View.GONE);
             mConfirmPasswordEt.setVisibility(View.GONE);
             mSubmitBtn.setText(getString(R.string.login));
-            mCreateAccountTv.setText(getString(R.string.create_account_text));
+            mCreateAccountTv.setText(getString(R.string.create_account));
         } else {
             mFirstNameEt.setVisibility(View.VISIBLE);
             mLastNameEt.setVisibility(View.VISIBLE);

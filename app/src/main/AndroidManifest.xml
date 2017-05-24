@@ -29,17 +29,23 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main" />
+        <activity
+            android:name=".InMailActivity"
+            android:label="In Mail" />
+        <activity
+            android:name=".PrivateMessageActivity"
+            android:label="Instant chat" />
 
         <activity
             android:name=".CreatePostActivity"
             android:label="@string/title_activity_post" />
 
-        <service android:name=".push_notification.SocialMessageService">
+        <service android:name=".services.SocialMessageService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".push_notification.SocialInstanceIDService">
+        <service android:name=".services.SocialInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

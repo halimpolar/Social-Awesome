@@ -19,6 +19,7 @@ import com.google.firebase.database.Transaction;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.User;
+import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -35,6 +36,10 @@ public class ProfileFragment extends SocialFragment {
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
     private Button mUpdateBtn;
+    private Button mCancelBtn;
+    private DatabaseReference mFirebaseDatabase;
+    //private FirebaseDatabase mFirebaseInstance;
+    String userId;
 
     public ProfileFragment() {
         mTitle = ProfileFragment.class.getSimpleName();
@@ -54,11 +59,37 @@ public class ProfileFragment extends SocialFragment {
         mAboutEt = (EditText) view.findViewById(R.id.about);
         mInterestEt = (EditText) view.findViewById(R.id.interests);
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
+        mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
+        //mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE);
 
+        mUpdateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String userid = mFirebaseDatabase.getKey();
+                String first_name = mFirstNameEt.getText().toString();
+                String last_name = mLastNameEt.getText().toString();
+                mFirebaseDatabase.child(userid).child("first_name").setValue(first_name);
+                mFirebaseDatabase.child(userid).child("last_name").setValue(last_name);
+                //updateUser(first_name, last_name);
+
+            }
+
+        });
         return view;
     }
 
-    @Override
+
+
+    private void updateUser(String first_name, String last_name) {
+        mFirebaseDatabase.child(userId).child("first_name").setValue(first_name);
+        mFirebaseDatabase.child(userId).child("last_name").setValue(last_name);
+
+    }
+
+
+
+/*    @Override
     public void onStart() {
         super.onStart();
         populateInfo();
@@ -103,7 +134,7 @@ public class ProfileFragment extends SocialFragment {
         setEditText(mFirstNameEt, user.first_name);
         setEditText(mProfessionEt, user.profession);
         setEditText(mAboutEt, user.aboutMe);
-        setEditText(mInterestEt, user.intestes);
+        setEditText(mInterestEt, user.interests);
     }
 
     private void setEditText(EditText et, String st) {
@@ -111,4 +142,5 @@ public class ProfileFragment extends SocialFragment {
             et.setText(st);
         }
     }
+    */
 }

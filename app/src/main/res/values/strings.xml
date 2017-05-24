@@ -14,8 +14,8 @@
     <string name="last_name">Last name</string>
     <string name="signup">Sign up</string>
     <string name="submit">Submit</string>
-    <string name="create_account_text">Click here to create account</string>
-    <string name="signin_text">Click here to login</string>
+    <string name="create_account">Create Account</string>
+    <string name="signin_text">Back To Login</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_post">Create New Post</string>
     <string name="action_settings">Settings</string>
@@ -23,8 +23,22 @@
     <string name="profile">Profile</string>
     <string name="setting">Setting</string>
     <string name="friends">Friends</string>
+    <string name="signout">Sign Out</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
 
     <string name="default_profile_pic">https://thumb10.shutterstock.com/display_pic_with_logo/1737244/149293433/stock-photo-anonymous-male-profile-picture-silhouette-profile-avatar-149293433.jpg</string>
+    <string name="hint_write_message">Write message here</string>
+    <string name="send">Send</string>
+    <string name="sent">Sent</string>
+    <string name="received">Received</string>
+
+    <!--Toast message-->
+    <string name="success_send_push">Push notification sent</string>
+    <string name="failure_send_push">Fail to send push notification</string>
+    <string name="success_send_email">Email sent</string>
+    <string name="failure_send_email">Fail to send email</string>
+
+    <string name="verify_account">Account Verified</string>
+
 </resources>

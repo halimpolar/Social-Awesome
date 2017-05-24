@@ -1,9 +1,7 @@
 package cmpe.sjsu.socialawesome.models;
 
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,6 +9,9 @@ import java.util.Map;
  */
 @IgnoreExtraProperties
 public class User {
+    public static final String TOKEN = "token";
+    public static final String PRIVATE_MESSAGE = "privateMessage";
+    public static final String IN_MAIL = "inMail";
     public static final String FRIEND_LIST = "friends";
     public static final String WAITING_FRIEND_LIST = "waitingFriends";
     public static final String FOLOWING_FRIEND_LIST = "followingFriends";
@@ -25,7 +26,7 @@ public class User {
     public String location;
     public String profession;
     public String aboutMe;
-    public String intestes;
+    public String interests;
     public String token;
 
     // 0 -- disable
@@ -36,18 +37,20 @@ public class User {
     public boolean notification;
 
     // List of friend already establish
-    public Map<String, UserSummary> friends;
+    public Map<String, String> friends;
 
     // List of friend this user sent invitation to
-    public Map<String, UserSummary> waitingFriends;
+    public Map<String, String> waitingFriends;
 
     // List of friend this user sent invitation to
-    public Map<String, UserSummary> followingFriends;
+    public Map<String, String> followingFriends;
 
     // List of person who follow me
-    public Map<String, UserSummary> follower;
+    public Map<String, String> follower;
 
-    // List of friends that sent invitation to this user
-    public Map<String, UserSummary> pendingFriends;
+    // List of friends that sent invitation to this user, pending friend request
+    public Map<String, String> pendingFriends;
 
+    public Map<String, PrivateMessage> privateMessage;
+    public Map<String, InMailMessage> inMail;
 }

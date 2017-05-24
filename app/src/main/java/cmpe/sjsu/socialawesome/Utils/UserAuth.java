@@ -11,8 +11,8 @@ import cmpe.sjsu.socialawesome.models.UserSummary;
 
 public class UserAuth {
     private static final UserAuth mInstance = new UserAuth();
-    private User mCurrentUser;
-    private UserSummary mCurrentUserSummary = new UserSummary();
+    private static User mCurrentUser;
+    private static UserSummary mCurrentUserSummary = new UserSummary();
 
 
     private UserAuth() {
@@ -26,7 +26,7 @@ public class UserAuth {
         return mCurrentUser;
     }
 
-    public UserSummary getCurrentUserSummary() {
+    public static UserSummary getCurrentUserSummary() {
         return mCurrentUserSummary;
     }
 
