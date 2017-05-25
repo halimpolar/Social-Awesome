@@ -1,5 +1,6 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cmpe.sjsu.socialawesome.Utils.FriendUtils;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
@@ -35,21 +37,23 @@ import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
  * A placeholder fragment containing a simple view.
  */
 public class FriendFragment extends SocialFragment {
-    private static ArrayList<String> mFriendList = new ArrayList<>();
-    private static ArrayList<String> mOutGoingFriendList = new ArrayList<>();
-    private static ArrayList<String> mPendingFriendRequestList = new ArrayList<>();
+    private static List<String> mFriendList = new ArrayList<>();
     private RecyclerView recList;
     private FriendListAdapter mAdapter;
+    private FriendListAdapter.OnInfoUpdateListener mListener;
 
-    public FriendFragment() {
-        mTitle = FriendFragment.class.getSimpleName();
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mTitle = context.getString(R.string.friends);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_friend, container, false);
-
         return v;
     }
 
@@ -57,12 +61,20 @@ public class FriendFragment extends SocialFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recList = (RecyclerView) view.findViewById(R.id.cardList);
+        mListener = new FriendListAdapter.OnInfoUpdateListener() {
+            @Override
+            public void onInfoUpdate(boolean bool, String st) {
+                ((MainActivity) getActivity()).switchFriendToProfileFrag(bool, st);
+            }
+        };
+
         recList.setHasFixedSize(false);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
-        mAdapter = new FriendListAdapter(mFriendList);
+        mAdapter = new FriendListAdapter(mFriendList, mListener);
         recList.setAdapter(mAdapter);
+
 
         final View addFriendByEmailView = view.findViewById(R.id.add_email_friend_view);
 
@@ -70,6 +82,7 @@ public class FriendFragment extends SocialFragment {
         OutRequstBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFriendByEmailView.setVisibility(View.GONE);
                 mFriendList = new ArrayList<>();
                 getFriendList(WAITING_FRIEND_LIST);
             }
@@ -79,6 +92,7 @@ public class FriendFragment extends SocialFragment {
         PendingFriendRequstBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFriendByEmailView.setVisibility(View.GONE);
                 mFriendList = new ArrayList<>();
                 getFriendList(PENDING_FRIEND_LIST);
             }
@@ -88,6 +102,7 @@ public class FriendFragment extends SocialFragment {
         FriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFriendByEmailView.setVisibility(View.GONE);
                 mFriendList = new ArrayList<>();
                 getFriendList(FRIEND_LIST);
             }
@@ -97,6 +112,7 @@ public class FriendFragment extends SocialFragment {
         followingFriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFriendByEmailView.setVisibility(View.GONE);
                 mFriendList = new ArrayList<>();
                 getFriendList(FOLOWING_FRIEND_LIST);
             }
@@ -126,8 +142,6 @@ public class FriendFragment extends SocialFragment {
                 }
             }
         });
-
-
     }
 
 
@@ -150,7 +164,8 @@ public class FriendFragment extends SocialFragment {
                     mFriendList.add(friendIdMap.id);
                     mAdapter.notifyDataSetChanged();
                 }
-                mAdapter = new FriendListAdapter(mFriendList);
+                mAdapter = new FriendListAdapter(mFriendList, mListener);
+
                 int type = 0;
                 switch (node) {
                     case FRIEND_LIST:
@@ -192,7 +207,7 @@ public class FriendFragment extends SocialFragment {
                     }
                     mAdapter.notifyDataSetChanged();
                 }
-                mAdapter = new FriendListAdapter(mFriendList);
+                mAdapter = new FriendListAdapter(mFriendList, mListener);
                 mAdapter.updateType(3);
                 recList.setAdapter(mAdapter);
             }
@@ -203,5 +218,6 @@ public class FriendFragment extends SocialFragment {
             }
         });
     }
+
 
 }

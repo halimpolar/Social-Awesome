@@ -50,7 +50,9 @@ public class FriendUtils {
                     }).start();
                     Toast.makeText(context, "Succes: friend request sent to " + email, Toast.LENGTH_SHORT).show();
                     //TODO: add email to waiting friend list
-                    userTableRef.child(UserAuth.getInstance().getCurrentUser().id).child(WAITING_FRIEND_LIST).push().setValue(email);
+                    UserIDMap emailId = new UserIDMap();
+                    emailId.id = email;
+                    userTableRef.child(UserAuth.getInstance().getCurrentUser().id).child(WAITING_FRIEND_LIST).push().setValue(emailId);
                 } else {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         User user = postSnapshot.getValue(User.class);

@@ -82,12 +82,15 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
 
-                if (fragment != null && !fragment.getTitle().equals(title)) {
+                if (mCurrentFragment == null || !mCurrentFragment.getTitle().equals(title)) {
                     mCurrentFragment = fragment;
+                    if(getSupportActionBar() != null) getSupportActionBar().setTitle(title);
+
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction transaction = fm.beginTransaction();
                     transaction.replace(R.id.content_frame, fragment);
                     transaction.commit();
+
                 }
             }
         });
@@ -115,7 +118,12 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
+
         }
+    }
+
+    public void switchFriendToProfileFrag(boolean isOtherUser, String otherUserId){
+//        mDrawerList.setItemChecked(1, true);
     }
 
     @Override
