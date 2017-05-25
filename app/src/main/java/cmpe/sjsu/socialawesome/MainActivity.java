@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (mCurrentFragment == null || !mCurrentFragment.getTitle().equals(title)) {
                     mCurrentFragment = fragment;
-                    if(getSupportActionBar() != null) getSupportActionBar().setTitle(title);
+                    if (getSupportActionBar() != null) getSupportActionBar().setTitle(title);
 
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction transaction = fm.beginTransaction();
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    public void switchFriendToProfileFrag(boolean isOtherU, String otherUserI){
+    public void switchFriendToProfileFrag(boolean isOtherU, String otherUserI) {
         isOtherUser = isOtherU;
         otherUserId = otherUserI;
         SocialFragment fragment = new ProfileFragment();
@@ -173,11 +173,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+    //    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void signOut() {
         UserAuth.getInstance().setCurrentUser(null);
-        if(mAuthListener != null) {
+        if (mAuthListener != null) {
             mAuth.signOut();
         }
 

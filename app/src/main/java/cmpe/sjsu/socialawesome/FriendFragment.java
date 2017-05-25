@@ -6,10 +6,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,6 +45,8 @@ public class FriendFragment extends SocialFragment {
     private RecyclerView recList;
     private FriendListAdapter mAdapter;
     private FriendListAdapter.OnInfoUpdateListener mListener;
+    private TextView mFriendTitle;
+    private View mAddFriendByEmailView;
 
 
     @Override
@@ -75,58 +81,11 @@ public class FriendFragment extends SocialFragment {
         mAdapter = new FriendListAdapter(mFriendList, mListener);
         recList.setAdapter(mAdapter);
 
+        mFriendTitle = (TextView) view.findViewById(R.id.friend_frag_title);
+        mAddFriendByEmailView = view.findViewById(R.id.add_email_friend_view);
 
-        final View addFriendByEmailView = view.findViewById(R.id.add_email_friend_view);
+        setHasOptionsMenu(true);
 
-        Button OutRequstBtn = (Button) view.findViewById(R.id.outgoing_friend_request_btn);
-        OutRequstBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFriendByEmailView.setVisibility(View.GONE);
-                mFriendList = new ArrayList<>();
-                getFriendList(WAITING_FRIEND_LIST);
-            }
-        });
-
-        Button PendingFriendRequstBtn = (Button) view.findViewById(R.id.friend_request_btn);
-        PendingFriendRequstBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFriendByEmailView.setVisibility(View.GONE);
-                mFriendList = new ArrayList<>();
-                getFriendList(PENDING_FRIEND_LIST);
-            }
-        });
-
-        Button FriendBtn = (Button) view.findViewById(R.id.friend_btn);
-        FriendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFriendByEmailView.setVisibility(View.GONE);
-                mFriendList = new ArrayList<>();
-                getFriendList(FRIEND_LIST);
-            }
-        });
-
-        Button followingFriendBtn = (Button) view.findViewById(R.id.following_friend_btn);
-        followingFriendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFriendByEmailView.setVisibility(View.GONE);
-                mFriendList = new ArrayList<>();
-                getFriendList(FOLOWING_FRIEND_LIST);
-            }
-        });
-
-        Button addFriendBtn = (Button) view.findViewById(R.id.add_friend_btn);
-        addFriendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFriendByEmailView.setVisibility(View.VISIBLE);
-                mFriendList = new ArrayList<>();
-                getPublicUser();
-            }
-        });
 
         Button addFriendEmailBtn = (Button) view.findViewById(R.id.add_email_friend_btn);
         final EditText emailET = (EditText) view.findViewById(R.id.email_editText);
@@ -148,8 +107,52 @@ public class FriendFragment extends SocialFragment {
     @Override
     public void onStart() {
         super.onStart();
-//        FriendUtils.addFriend(getActivity(), 0, "cBjf2Jmc4TbiZsPWyG4L0Fa2dKl2");
         getFriendList(FRIEND_LIST);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        getActivity().getMenuInflater().inflate(R.menu.menu_friend, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.friendMenu:
+                mFriendTitle.setText("Friends");
+                mAddFriendByEmailView.setVisibility(View.GONE);
+                mFriendList = new ArrayList<>();
+                getFriendList(FRIEND_LIST);
+                return true;
+            case R.id.addFriendMenu:
+                mFriendTitle.setText("Add Friend");
+                mAddFriendByEmailView.setVisibility(View.VISIBLE);
+                mFriendList = new ArrayList<>();
+                getPublicUser();
+                return true;
+            case R.id.incomingFriendReqMenu:
+                mFriendTitle.setText("Pending Friend Request");
+                mAddFriendByEmailView.setVisibility(View.GONE);
+                mFriendList = new ArrayList<>();
+                getFriendList(PENDING_FRIEND_LIST);
+                return true;
+            case R.id.OutgoingFriendReqMenu:
+                mFriendTitle.setText("Out Going Friend Request");
+                mAddFriendByEmailView.setVisibility(View.GONE);
+                mFriendList = new ArrayList<>();
+                getFriendList(WAITING_FRIEND_LIST);
+                return true;
+            case R.id.followedFriendMenu:
+                mFriendTitle.setText("Following Friends");
+                mAddFriendByEmailView.setVisibility(View.GONE);
+                mFriendList = new ArrayList<>();
+                getFriendList(FOLOWING_FRIEND_LIST);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void getFriendList(final String node) {
