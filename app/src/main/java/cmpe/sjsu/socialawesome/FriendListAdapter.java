@@ -164,7 +164,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                     holder.mRootView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if(mListener != null) mListener.onInfoUpdate(false, user.id);
+                            if(mListener != null) mListener.onInfoUpdate(true, user.id);
                         }
                     });
 //                    if(user.profilePhotoURL != null){

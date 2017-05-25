@@ -1,6 +1,7 @@
 package cmpe.sjsu.socialawesome;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -49,10 +50,15 @@ public class TimeLineFragment extends SocialFragment {
     public static String FIREBASE_FRIENDS_KEY = "friends";
     public static String FIREBASE_FOLLOWING_KEY = "followingFriends";
 
-    public TimeLineFragment() {
-        mTitle = TimeLineFragment.class.getSimpleName();
-    }
+//    public TimeLineFragment() {
+//        mTitle = TimeLineFragment.class.getSimpleName();
+//    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mTitle = context.getString(R.string.timeline);
 
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

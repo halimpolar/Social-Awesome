@@ -192,15 +192,16 @@ public class ProfileFragment extends SocialFragment {
                         public void run() {
                             postList = new ArrayList<>();
                             HashMap posts = ((HashMap)((HashMap)mutableData.getValue()).get("posts"));
-                            Iterator postIterator = posts.entrySet().iterator();
-                            while (postIterator.hasNext()) {
-                                Map.Entry entry = (Map.Entry) postIterator.next();
-                                HashMap postMap = (HashMap)entry.getValue();
-                                Post post = new Post(user, (long)postMap.get("timestamp"),
-                                        (String)postMap.get("contentPost"), (String)postMap.get("contentPhotoURL"));
-                                postList.add(post);
+                            if(posts != null) {
+                                Iterator postIterator = posts.entrySet().iterator();
+                                while (postIterator.hasNext()) {
+                                    Map.Entry entry = (Map.Entry) postIterator.next();
+                                    HashMap postMap = (HashMap) entry.getValue();
+                                    Post post = new Post(user, (long) postMap.get("timestamp"),
+                                            (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
+                                    postList.add(post);
+                                }
                             }
-
                             populateStandardView(user);
                             populateInfoIntoEditText(user);
                             Collections.sort(postList);

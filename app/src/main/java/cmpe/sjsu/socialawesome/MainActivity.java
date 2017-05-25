@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
-        String title = getString(R.string.timeline);
+        String mTitle = getString(R.string.timeline);
         SocialFragment fragment = new TimeLineFragment();
         mCurrentFragment = fragment;
 
@@ -145,8 +145,16 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    public void switchFriendToProfileFrag(boolean isOtherUser, String otherUserId){
-//        mDrawerList.setItemChecked(1, true);
+    public void switchFriendToProfileFrag(boolean isOtherU, String otherUserI){
+        isOtherUser = isOtherU;
+        otherUserId = otherUserI;
+        SocialFragment fragment = new ProfileFragment();
+        mCurrentFragment = fragment;
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+        transaction.commit();
     }
 
     @Override
