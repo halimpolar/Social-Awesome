@@ -17,7 +17,6 @@ public class UserAuth {
     private static UserIDMap mCurrentUserIdMap = new UserIDMap();
 
 
-
     private UserAuth() {
     }
 
@@ -29,7 +28,7 @@ public class UserAuth {
         return mCurrentUser;
     }
 
-    public static UserIDMap getCurrentUserIdMap(){
+    public static UserIDMap getCurrentUserIdMap() {
         return mCurrentUserIdMap;
     }
 
@@ -39,19 +38,9 @@ public class UserAuth {
 
     public void setCurrentUser(User user) {
         mCurrentUser = user;
-//        setCurrentUserSummary(user);
-//        setCurrentUserSummary(user);
-        setCurrentUserIdMap(user);
+        if (user != null)
+            setCurrentUserIdMap(user);
     }
-
-//    public void setCurrentUserSummary(User user) {
-//        mCurrentUserSummary.id = user.id;
-//        mCurrentUserSummary.email = user.email;
-//        mCurrentUserSummary.first_name = user.first_name;
-//        mCurrentUserSummary.last_name = user.last_name;
-//        mCurrentUserSummary.profilePhotoURL = user.profilePhotoURL;
-//        mCurrentUserSummary.status = user.status;
-//    }
 
     public void setCurrentUserIdMap(User user) {
         mCurrentUserIdMap.id = user.id;
