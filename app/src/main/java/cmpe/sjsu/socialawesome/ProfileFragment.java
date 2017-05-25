@@ -2,8 +2,12 @@ package cmpe.sjsu.socialawesome;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -13,20 +17,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
@@ -39,6 +54,7 @@ import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
  */
 public class ProfileFragment extends SocialFragment {
     private static final String TAG = ProfileFragment.class.toString();
+    private static int UPLOAD_REQUEST = 31;
 
     private EditText mNicknameEt;
     private EditText mEmailEt;
@@ -48,14 +64,32 @@ public class ProfileFragment extends SocialFragment {
     private EditText mInterestEt;
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
+
+    private TextView mNickname;
+    private TextView mEmail;
+    private TextView mLocation;
+    private TextView mProfession;
+    private TextView mAbout;
+    private TextView mInterest;
+    private TextView mFirstName;
+    private TextView mLastName;
+
+    private ImageView profilePicEt;
+    private ImageView profilePic;
+
     private Button mUpdateBtn;
     private Button mEditBtn;
     private Button mCancelBtn;
     private DatabaseReference mFirebaseDatabase;
     String userId;
 
+    private View editView;
+    private View standardView;
+    private View changeProfileBtn;
+
     private String currentUserId;
     private MainActivity activity;
+    private ProgressDialog pd;
 
     private RecyclerView mTimelineListView;
     private ArrayList<Post> postList;
@@ -70,7 +104,8 @@ public class ProfileFragment extends SocialFragment {
         View view = inflater.inflate(R.layout.profile_fragment, container, false);
 
         mEditBtn = (Button) view.findViewById(R.id.edit_btn);
-
+        editView = view.findViewById(R.id.editView);
+        standardView = view.findViewById(R.id.standardView);
 
         mNicknameEt = (EditText) view.findViewById(R.id.nickname);
         mFirstNameEt = (EditText) view.findViewById(R.id.first_name);
@@ -80,8 +115,19 @@ public class ProfileFragment extends SocialFragment {
         mProfessionEt = (EditText) view.findViewById(R.id.profession);
         mAboutEt = (EditText) view.findViewById(R.id.about_me);
         mInterestEt = (EditText) view.findViewById(R.id.interests);
+        mNickname = (TextView) view.findViewById(R.id.nicknameSV);
+        mFirstName = (TextView) view.findViewById(R.id.first_nameSV);
+        mLastName = (TextView) view.findViewById(R.id.last_nameSV);
+        mEmail = (TextView) view.findViewById(R.id.emailSV);
+        mLocation = (TextView) view.findViewById(R.id.locationSV);
+        mProfession = (TextView) view.findViewById(R.id.professionSV);
+        mAbout = (TextView) view.findViewById(R.id.about_meSV);
+        mInterest = (TextView) view.findViewById(R.id.interestsSV);
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
         mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
+        profilePic = (ImageView) view.findViewById(R.id.profilePicSV);
+        profilePicEt = (ImageView) view.findViewById(R.id.profilePic);
+        changeProfileBtn = view.findViewById(R.id.changeProfilePicBtn);
         mTimelineListView = (RecyclerView) view.findViewById(R.id.timelineListView);
 
         return view;
@@ -90,17 +136,7 @@ public class ProfileFragment extends SocialFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mEditBtn.setVisibility(View.VISIBLE);
-        mFirstNameEt.setVisibility(View.GONE);
-        mLastNameEt.setVisibility(View.GONE);
-        mNicknameEt.setVisibility(View.GONE);
-        mEmailEt.setVisibility(View.GONE);
-        mLocationEt.setVisibility(View.GONE);
-        mProfessionEt.setVisibility(View.GONE);
-        mAboutEt.setVisibility(View.GONE);
-        mInterestEt.setVisibility(View.GONE);
-        mUpdateBtn.setVisibility(View.GONE);
-        mCancelBtn.setVisibility(View.GONE);
+        toggleEditMode(false);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mTimelineListView.setLayoutManager(mLayoutManager);
@@ -108,34 +144,27 @@ public class ProfileFragment extends SocialFragment {
         mEditBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mEditBtn.setVisibility(View.GONE);
-                mFirstNameEt.setVisibility(View.VISIBLE);
-                mLastNameEt.setVisibility(View.VISIBLE);
-                mNicknameEt.setVisibility(View.VISIBLE);
-                mEmailEt.setVisibility(View.VISIBLE);
-                mLocationEt.setVisibility(View.VISIBLE);
-                mProfessionEt.setVisibility(View.VISIBLE);
-                mAboutEt.setVisibility(View.VISIBLE);
-                mInterestEt.setVisibility(View.VISIBLE);
-                mUpdateBtn.setVisibility(View.VISIBLE);
-                mCancelBtn.setVisibility(View.VISIBLE);
+                toggleEditMode(true);
 
                 mCancelBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mEditBtn.setVisibility(View.VISIBLE);
-                        mFirstNameEt.setVisibility(View.GONE);
-                        mLastNameEt.setVisibility(View.GONE);
-                        mNicknameEt.setVisibility(View.GONE);
-                        mEmailEt.setVisibility(View.GONE);
-                        mLocationEt.setVisibility(View.GONE);
-                        mProfessionEt.setVisibility(View.GONE);
-                        mAboutEt.setVisibility(View.GONE);
-                        mInterestEt.setVisibility(View.GONE);
-                        mUpdateBtn.setVisibility(View.GONE);
-                        mCancelBtn.setVisibility(View.GONE);
+                        toggleEditMode(false);
                     }
                 });
+            }
+        });
+        pd = new ProgressDialog(getContext());
+        pd.setCancelable(false);
+        pd.setMessage("Uploading image...");
+
+        changeProfileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_PICK);
+                startActivityForResult(Intent.createChooser(intent, "Select Image"), UPLOAD_REQUEST);
             }
         });
 
@@ -172,6 +201,7 @@ public class ProfileFragment extends SocialFragment {
                                 postList.add(post);
                             }
 
+                            populateStandardView(user);
                             populateInfoIntoEditText(user);
                             Collections.sort(postList);
                             TimeLineAdapter mAdapter = new TimeLineAdapter(postList);
@@ -211,7 +241,9 @@ public class ProfileFragment extends SocialFragment {
                 mFirebaseDatabase.child("profession").setValue(profession);
                 mFirebaseDatabase.child("about_me").setValue(about_me);
                 mFirebaseDatabase.child("interest").setValue(interest);
-
+                if (UserAuth.getInstance().getCurrentUser().profilePhotoURL != null) {
+                    mFirebaseDatabase.child("profilePhotoURL").setValue(UserAuth.getInstance().getCurrentUser().profilePhotoURL);
+                }
 
                 UserAuth.getInstance().getCurrentUser().first_name = first_name;
                 UserAuth.getInstance().getCurrentUser().last_name = last_name;
@@ -221,19 +253,10 @@ public class ProfileFragment extends SocialFragment {
                 UserAuth.getInstance().getCurrentUser().profession = profession;
                 UserAuth.getInstance().getCurrentUser().about_me = about_me;
                 UserAuth.getInstance().getCurrentUser().interest = interest;
+                populateStandardView(UserAuth.getInstance().getCurrentUser());
                 Toast.makeText(getActivity(), "Profile Has Been Updated",Toast.LENGTH_SHORT).show();
 
-                mEditBtn.setVisibility(View.VISIBLE);
-                mFirstNameEt.setVisibility(View.GONE);
-                mLastNameEt.setVisibility(View.GONE);
-                mNicknameEt.setVisibility(View.GONE);
-                mEmailEt.setVisibility(View.GONE);
-                mLocationEt.setVisibility(View.GONE);
-                mProfessionEt.setVisibility(View.GONE);
-                mAboutEt.setVisibility(View.GONE);
-                mInterestEt.setVisibility(View.GONE);
-                mUpdateBtn.setVisibility(View.GONE);
-                mCancelBtn.setVisibility(View.GONE);
+                toggleEditMode(false);
             }
         });
 
@@ -246,7 +269,48 @@ public class ProfileFragment extends SocialFragment {
         });
     }
 
+    private void toggleEditMode(boolean isEditMode) {
+        if (isEditMode) {
+            mEditBtn.setVisibility(View.GONE);
+            mUpdateBtn.setVisibility(View.VISIBLE);
+            mCancelBtn.setVisibility(View.VISIBLE);
+            standardView.setVisibility(View.GONE);
+            editView.setVisibility(View.VISIBLE);
+            mTimelineListView.setVisibility(View.GONE);
+        } else {
+            mEditBtn.setVisibility(View.VISIBLE);
+            mUpdateBtn.setVisibility(View.GONE);
+            mCancelBtn.setVisibility(View.GONE);
+            standardView.setVisibility(View.VISIBLE);
+            editView.setVisibility(View.GONE);
+            mTimelineListView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void populateStandardView(User user) {
+        if (user.profilePhotoURL == null || user.profilePhotoURL.isEmpty()) {
+            String defaultURL = getResources().getString(R.string.default_profile_pic);
+            Picasso.with(getContext()).load(defaultURL).into(profilePic);
+        } else {
+            Picasso.with(getContext()).load(user.profilePhotoURL).into(profilePic);
+        }
+        setTextView(mFirstName, user.first_name);
+        setTextView(mLastName, user.last_name);
+        setTextView(mEmail, user.email);
+        setTextView(mLocation, user.location);
+        setTextView(mNickname, user.nickname);
+        setTextView(mInterest, user.interest);
+        setTextView(mProfession, user.profession);
+        setTextView(mAbout, user.about_me);
+    }
+
     private void populateInfoIntoEditText(User user) {
+        if (user.profilePhotoURL == null || user.profilePhotoURL.isEmpty()) {
+            String defaultURL = getResources().getString(R.string.default_profile_pic);
+            Picasso.with(getContext()).load(defaultURL).into(profilePicEt);
+        } else {
+            Picasso.with(getContext()).load(user.profilePhotoURL).into(profilePicEt);
+        }
         setEditText(mFirstNameEt, user.first_name);
         setEditText(mLastNameEt, user.last_name);
         setEditText(mEmailEt, user.email);
@@ -255,7 +319,14 @@ public class ProfileFragment extends SocialFragment {
         setEditText(mInterestEt, user.interest);
         setEditText(mProfessionEt, user.profession);
         setEditText(mAboutEt, user.about_me);
+    }
 
+    private void setTextView(TextView tv, String str) {
+        if (TextUtils.isEmpty(str)) {
+            tv.setText("");
+        } else {
+            tv.setText(str);
+        }
     }
 
     private void setEditText(EditText et, String st) {
@@ -269,4 +340,37 @@ public class ProfileFragment extends SocialFragment {
 
 
     //}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == UPLOAD_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            Uri filePath = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                profilePicEt.setImageBitmap(bitmap);
+                pd.show();
+                String fileName = UUID.randomUUID().toString() + ".jpg";
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                StorageReference newRef = storageRef.child(fileName);
+                UploadTask uploadTask = newRef.putFile(filePath);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        pd.dismiss();
+                        UserAuth.getInstance().getCurrentUser().profilePhotoURL = taskSnapshot.getDownloadUrl().toString();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pd.dismiss();
+                        Toast.makeText(getActivity(), "Upload failed", Toast.LENGTH_LONG);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
