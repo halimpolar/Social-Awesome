@@ -37,6 +37,8 @@ public class User implements Serializable {
 
     public boolean notification;
 
+    public boolean pushNotification;
+
     // List of friend already establish
     public Map<String, UserIDMap> friends;
 

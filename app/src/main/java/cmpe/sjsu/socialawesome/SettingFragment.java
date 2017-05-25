@@ -33,6 +33,9 @@ public class SettingFragment extends SocialFragment {
     private DatabaseReference mFirebaseDatabase;
     private DatabaseReference msubData;
     private DatabaseReference msuData;
+    private RadioGroup pushNoRadioGroup;
+    private RadioButton pushNoRadioYes;
+    private RadioButton pushNoRadioNo;
 
     public SettingFragment() {
         mTitle = SettingFragment.class.getSimpleName();
@@ -41,7 +44,6 @@ public class SettingFragment extends SocialFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //return inflater.inflate(R.layout.fragment_setting, container, false);
         final View view = inflater.inflate(R.layout.fragment_setting, container, false);
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child(StartActivity.USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id);
         radio_private = (RadioButton) view.findViewById(R.id.radio_private);
@@ -51,7 +53,35 @@ public class SettingFragment extends SocialFragment {
         radio_no = (RadioButton) view.findViewById(R.id.radio_no);
         radioGroup1 = (RadioGroup) view.findViewById(R.id.radioGroup1);
         radioGroup2 = (RadioGroup) view.findViewById(R.id.radioGroup2);
-        backBtn = (Button) view.findViewById(R.id.back_button);
+        pushNoRadioGroup = (RadioGroup) view.findViewById(R.id.pushNoRadioGroup);
+        pushNoRadioYes = (RadioButton) view.findViewById(R.id.pushNoRadioYes);
+        pushNoRadioNo = (RadioButton) view.findViewById(R.id.pushNoRadioNo);
+
+        int userStatus = UserAuth.getInstance().getCurrentUser().status;
+        boolean userNotificationSet = UserAuth.getInstance().getCurrentUser().notification;
+        boolean userPushNoSet = UserAuth.getInstance().getCurrentUser().pushNotification;
+
+        switch (userStatus) {
+            case 1:
+                radio_friend.setChecked(true);
+                break;
+            case 2:
+                radio_public.setChecked(true);
+                break;
+            default:
+        }
+
+        if (userNotificationSet) {
+            radio_yes.setChecked(true);
+        } else {
+            radio_no.setChecked(true);
+        }
+
+        if (userPushNoSet) {
+            pushNoRadioYes.setChecked(true);
+        } else {
+            pushNoRadioYes.setChecked(true);
+        }
 
         radioGroup1.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -85,127 +115,32 @@ public class SettingFragment extends SocialFragment {
                         break;
                     case R.id.radio_no:
                         mFirebaseDatabase.child("notification").setValue(false);
-                        Toast.makeText(getActivity(), "No Email Notification", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Disabled Email Notification", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+
+        pushNoRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                mAuth = FirebaseAuth.getInstance();
+                switch (checkedId) {
+                    case R.id.pushNoRadioYes:
+                        mFirebaseDatabase.child("pusNotification").setValue(true);
+                        Toast.makeText(getActivity(), "Push Notification Set", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.pushNoRadioNo:
+                        mFirebaseDatabase.child("pusNotification").setValue(false);
+                        Toast.makeText(getActivity(), "Disabled Push Notification", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
         });
 
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Fragment fragment = new ProfileFragment();
-//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                fragmentTransaction.replace(R.id.content_frame, fragment);
-//                fragmentTransaction.addToBackStack(null);
-//                fragmentTransaction.commit();
-
-                //        List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
-//        HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
-//
-//        tokens = Arrays.asList("lam.tran@sjsu.edu");
-//        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
-
-                Intent intent = new Intent(getActivity(), InMailActivity.class);
-                intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_LIST);
-//        UserSummary summary = new UserSummary();
-//        summary.email = "lamtran91@gmail.com";
-//        summary.id = "nEKXWvqoroRjtFqLd9c3Z3ZF3Bi2";
-
-//        UserSummary summary = new UserSummary();
-//        summary.email = "lam.tran@sjsu.edu";
-//        summary.id = "NavUTJHA91azs7Un6iA69VDf7JX2";
-//        intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, summary);
-
-                startActivity(intent);
-            }
-        });
-
-        view.findViewById(R.id.inmail_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), InMailActivity.class);
-                intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_DETAIL);
-                startActivity(intent);
-            }
-        });
-
-        view.findViewById(R.id.new_chat).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
-                intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
-                UserIDMap id = new UserIDMap();
-                id.id = "NavUTJHA91azs7Un6iA69VDf7JX2";
-                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, id);
-                startActivity(intent);
-            }
-        });
-
-        view.findViewById(R.id.private_chat).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
-                intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_LIST);
-                startActivity(intent);
-            }
-        });
-
-
         return view;
 
-
     }
-
-
-    /*public void onRadioButtonClick(View view) {
-        boolean checked = ((RadioButton) view).isChecked();
-
-        mAuth = FirebaseAuth.getInstance();
-        switch(view.getId()) {
-            case R.id.radio_private:
-                if(checked){
-                    mFirebaseDatabase.child("status").setValue(0);
-                }
-                break;
-            case R.id.radio_public:
-                if(checked) {
-                    mFirebaseDatabase.child("status").setValue(2);
-                }
-                break;
-            case R.id.radio_friend:
-                if(checked) {
-                    mFirebaseDatabase.child("status").setValue(1);
-                }
-                break;
-            case R.id.radio_yes:
-                if(checked) {
-                    mFirebaseDatabase.child("notification").setValue(true);
-                }
-                break;
-            case R.id.radio_no:
-                if(checked) {
-                    mFirebaseDatabase.child("notification").setValue(false);
-                }
-                break;
-        }
-    }*/
-
 }
 
-//   @Override
-//   public void onStart() {
-//       super.onStart();
-//        List<String> tokens = Arrays.asList(UserAuth.getInstance().getCurrentUser().token);
-//        HTTPUtil.sendPushNotification(getActivity(), tokens, "Test title", "Test Message", null);
-//
-//        tokens = Arrays.asList("lam.tran@sjsu.edu");
-//        HTTPUtil.sendEmail(getActivity(), tokens, "Test title", "Test Message");
-
-//        Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
-//        intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
-//        startActivity(intent);
-//    }
-//}
