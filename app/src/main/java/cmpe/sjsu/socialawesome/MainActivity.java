@@ -2,7 +2,6 @@ package cmpe.sjsu.socialawesome;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -15,29 +14,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
-import cmpe.sjsu.socialawesome.models.User;
 
 public class MainActivity extends AppCompatActivity {
+    public String otherUserId = null;
+    public boolean isOtherUser = false;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private List<String> mDrawerListTitles = new ArrayList<>();
     private ActionBarDrawerToggle mDrawerToggle;
-
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
     private SocialFragment mCurrentFragment;
-
-    public String otherUserId = null;
-    public boolean isOtherUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         mDrawerListTitles.add(getString(R.string.timeline));
         mDrawerListTitles.add(getString(R.string.profile));
         mDrawerListTitles.add(getString(R.string.friends));
+        mDrawerListTitles.add(getString(R.string.title_inmail));
+        mDrawerListTitles.add(getString(R.string.messenger));
         mDrawerListTitles.add(getString(R.string.setting));
         mDrawerListTitles.add(getString(R.string.signout));
 
@@ -63,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 SocialFragment fragment = null;
                 String title = null;
+                Intent intent = null;
                 switch (position) {
                     case 0:
                         //Timeline
@@ -81,13 +77,23 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new FriendFragment();
                         break;
                     case 3:
+                        //In Mail List
+                        intent = new Intent(MainActivity.this, InMailActivity.class);
+                        intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_LIST);
+                        startActivity(intent);
+                        return;
+                    case 4:
+                        intent = new Intent(MainActivity.this, PrivateMessageActivity.class);
+                        intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_LIST);
+                        startActivity(intent);
+                        return;
+                    case 5:
                         //Setting
                         title = getString(R.string.setting);
                         fragment = new SettingFragment();
                         break;
-                    case 4:
+                    case 6:
                         //Sign Out
-                        title = getString(R.string.signout);
                         signOut();
                         FirebaseAuth.getInstance().signOut();
                         startActivity(new Intent(MainActivity.this, StartActivity.class));

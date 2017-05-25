@@ -93,6 +93,9 @@ public class InMailDetailFragment extends SocialFragment {
                         addNewChat(((EditText) mUserNameEt).getText().toString(), ((EditText) mSubjectEt).getText().toString(), ((EditText) mContentEt).getText().toString());
                 }
             });
+            if(getArguments() != null && getArguments().getString(IN_MAIL_EMAIL_ADDRESS) != null) {
+                ((EditText) mUserNameEt).setText(getArguments().getString(IN_MAIL_EMAIL_ADDRESS));
+            }
         }
     }
 

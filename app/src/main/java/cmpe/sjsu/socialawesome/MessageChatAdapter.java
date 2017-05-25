@@ -46,9 +46,11 @@ public class MessageChatAdapter extends RecyclerView.Adapter<MessageChatAdapter.
             public void execute(User user) {
                 holder.mTextContent.setText(message.message);
                 holder.mUserName.setText(message.isSelf ? mCurrentUser.email : user.email);
-                if (user.profilePhotoURL != null) {
+
+                String photoURL = message.isSelf ? UserAuth.getInstance().getCurrentUser().profilePhotoURL : user.profilePhotoURL;
+                if (photoURL != null) {
                     Picasso.with(holder.mUserImage.getContext()).
-                            load(user.profilePhotoURL).into(holder.mUserImage);
+                            load(photoURL).into(holder.mUserImage);
                 } else {
                     String defaultURL = holder.mUserImage.getContext().getResources().getString(R.string.default_profile_pic);
                     Picasso.with(holder.mUserImage.getContext()).load(defaultURL).into(holder.mUserImage);
@@ -77,6 +79,8 @@ public class MessageChatAdapter extends RecyclerView.Adapter<MessageChatAdapter.
             mUserImage = (ImageView) view.findViewById(R.id.userImage);
             mUserName = (TextView) view.findViewById(R.id.userName);
             mTextContent = (TextView) view.findViewById(R.id.message_content);
+
+            mUserImage.setImageBitmap(null);
         }
     }
 }

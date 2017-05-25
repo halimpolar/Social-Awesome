@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="cmpe.sjsu.socialawesome.MainActivity">
+    <item
+        android:id="@+id/new_in_mail"
+        android:orderInCategory="100"
+        android:title="@string/send_in_mail"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/new_chat"
+        android:orderInCategory="100"
+        android:title="@string/start_chat"
+        app:showAsAction="never" />
+</menu>

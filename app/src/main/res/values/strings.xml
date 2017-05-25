@@ -23,6 +23,7 @@
     <string name="profile">Profile</string>
     <string name="setting">Setting</string>
     <string name="friends">Friends</string>
+    <string name="messenger">Messenger</string>
     <string name="signout">Sign Out</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
@@ -32,6 +33,9 @@
     <string name="send">Send</string>
     <string name="sent">Sent</string>
     <string name="received">Received</string>
+    <string name="new_message">New Message</string>
+    <string name="send_in_mail">Send In Mail</string>
+    <string name="start_chat">Start Chat</string>
 
     <!--Toast message-->
     <string name="success_send_push">Push notification sent</string>
