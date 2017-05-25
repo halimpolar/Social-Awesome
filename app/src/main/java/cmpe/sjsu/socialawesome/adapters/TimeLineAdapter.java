@@ -57,7 +57,7 @@ public class TimeLineAdapter extends RecyclerView.Adapter<TimeLineAdapter.ViewHo
         holder.authorName.setText(posts.get(position).getAuthorName());
         holder.postContent.setText(posts.get(position).getContentPost());
 
-        User currentUser = UserAuth.getInstance().getCurrentUser();
+        User currentUser = posts.get(position).getUser();
         if (currentUser.profilePhotoURL != null) {
             Picasso.with(holder.profilePic.getContext()).load(currentUser.profilePhotoURL).into(holder.profilePic);
         } else {

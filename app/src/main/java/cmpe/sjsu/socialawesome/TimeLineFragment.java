@@ -113,38 +113,43 @@ public class TimeLineFragment extends SocialFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 postList = new ArrayList<>();
+                Iterator postIterator;
 
                 HashMap usersMap = (HashMap) dataSnapshot.getValue();
                 HashMap currentUser = (HashMap) usersMap.get(UserAuth.getInstance().getCurrentUser().id);
-                Iterator postIterator = ((HashMap) currentUser.get(FIREBASE_POST_KEY)).entrySet().iterator();
-                while (postIterator.hasNext()) {
-                    Map.Entry postEntry = (Map.Entry) postIterator.next();
-                    HashMap postMap = (HashMap) postEntry.getValue();
-                    Post post = new Post(UserAuth.getInstance().getCurrentUser(), (long) postMap.get("timestamp"),
-                            (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
-                    postList.add(post);
+                if (currentUser.get(FIREBASE_POST_KEY) != null) {
+                    postIterator = ((HashMap) currentUser.get(FIREBASE_POST_KEY)).entrySet().iterator();
+                    while (postIterator.hasNext()) {
+                        Map.Entry postEntry = (Map.Entry) postIterator.next();
+                        HashMap postMap = (HashMap) postEntry.getValue();
+                        Post post = new Post(UserAuth.getInstance().getCurrentUser(), (long) postMap.get("timestamp"),
+                                (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
+                        postList.add(post);
+                    }
                 }
-                Iterator friendIterator = ((HashMap) currentUser.get(FIREBASE_FRIENDS_KEY)).entrySet().iterator();
-                while (friendIterator.hasNext()) {
-                    Map.Entry friendEntry = (Map.Entry) friendIterator.next();
-                    HashMap friendMap = (HashMap) usersMap.get(friendEntry.getKey().toString());
-                    User friendUser = new User();
-                    friendUser.first_name = (String) friendMap.get("first_name");
-                    friendUser.last_name = (String) friendMap.get("last_name");
-                    friendUser.profilePhotoURL = (String) friendMap.get("profilePhotoURL");
-                    HashMap detailFriendMap = (HashMap) friendMap.get(FIREBASE_POST_KEY);
-                    if (detailFriendMap != null) {
-                        postIterator = (detailFriendMap).entrySet().iterator();
-                        while (postIterator.hasNext()) {
-                            Map.Entry postEntry = (Map.Entry) postIterator.next();
-                            HashMap postMap = (HashMap) postEntry.getValue();
-                            Post post = new Post(friendUser, (long) postMap.get("timestamp"),
-                                    (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
-                            postList.add(post);
+                if (currentUser.get(FIREBASE_FRIENDS_KEY) != null) {
+                    Iterator friendIterator = ((HashMap) currentUser.get(FIREBASE_FRIENDS_KEY)).entrySet().iterator();
+                    while (friendIterator.hasNext()) {
+                        Map.Entry friendEntry = (Map.Entry) friendIterator.next();
+                        HashMap friendMap = (HashMap) usersMap.get(friendEntry.getKey().toString());
+                        User friendUser = new User();
+                        friendUser.first_name = (String) friendMap.get("first_name");
+                        friendUser.last_name = (String) friendMap.get("last_name");
+                        friendUser.profilePhotoURL = (String) friendMap.get("profilePhotoURL");
+                        HashMap detailFriendMap = (HashMap) friendMap.get(FIREBASE_POST_KEY);
+                        if (detailFriendMap != null) {
+                            postIterator = (detailFriendMap).entrySet().iterator();
+                            while (postIterator.hasNext()) {
+                                Map.Entry postEntry = (Map.Entry) postIterator.next();
+                                HashMap postMap = (HashMap) postEntry.getValue();
+                                Post post = new Post(friendUser, (long) postMap.get("timestamp"),
+                                        (String) postMap.get("contentPost"), (String) postMap.get("contentPhotoURL"));
+                                postList.add(post);
+                            }
                         }
                     }
                 }
-                if ((currentUser.get(FIREBASE_FOLLOWING_KEY)) != null) {
+                if (currentUser.get(FIREBASE_FOLLOWING_KEY) != null) {
                     Iterator followIterator = ((HashMap) currentUser.get(FIREBASE_FOLLOWING_KEY)).entrySet().iterator();
                     while (followIterator.hasNext()) {
                         Map.Entry followEntry = (Map.Entry) followIterator.next();
