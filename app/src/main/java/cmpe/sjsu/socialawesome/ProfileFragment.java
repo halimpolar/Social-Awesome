@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import cmpe.sjsu.socialawesome.Utils.DbUtils;
+import cmpe.sjsu.socialawesome.Utils.FriendUtils;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
 import cmpe.sjsu.socialawesome.models.Post;
@@ -51,6 +53,11 @@ import cmpe.sjsu.socialawesome.models.User;
 import cmpe.sjsu.socialawesome.models.UserIDMap;
 
 import static cmpe.sjsu.socialawesome.InMailDetailFragment.IN_MAIL_EMAIL_ADDRESS;
+import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
+import static cmpe.sjsu.socialawesome.models.User.FOLOWING_FRIEND_LIST;
+import static cmpe.sjsu.socialawesome.models.User.FRIEND_LIST;
+import static cmpe.sjsu.socialawesome.models.User.PENDING_FRIEND_LIST;
+import static cmpe.sjsu.socialawesome.models.User.WAITING_FRIEND_LIST;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -79,7 +86,6 @@ public class ProfileFragment extends SocialFragment {
     private ImageView profilePicEt;
     private ImageView profilePic;
     private Button mUpdateBtn;
-    private Button mEditBtn;
     private Button mCancelBtn;
     private DatabaseReference mFirebaseDatabase;
     private View editView;
@@ -93,6 +99,12 @@ public class ProfileFragment extends SocialFragment {
     private RecyclerView mTimelineListView;
     private ArrayList<Post> postList;
 
+    MenuItem mFollowItem;
+    MenuItem mAddFriendItem;
+    MenuItem mNewInMailItem;
+    MenuItem mNewChatItem;
+    MenuItem mEditProfileItem;
+
     public ProfileFragment() {
         mTitle = ProfileFragment.class.getSimpleName();
     }
@@ -100,10 +112,9 @@ public class ProfileFragment extends SocialFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.profile_fragment, container, false);
+        setHasOptionsMenu(true);
 
-        mEditBtn = (Button) view.findViewById(R.id.edit_btn);
         editView = view.findViewById(R.id.editView);
         standardView = view.findViewById(R.id.standardView);
 
@@ -142,19 +153,6 @@ public class ProfileFragment extends SocialFragment {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mTimelineListView.setLayoutManager(mLayoutManager);
 
-        mEditBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleEditMode(true);
-
-                mCancelBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        toggleEditMode(false);
-                    }
-                });
-            }
-        });
         pd = new ProgressDialog(getContext());
         pd.setCancelable(false);
         pd.setMessage("Uploading image...");
@@ -172,12 +170,10 @@ public class ProfileFragment extends SocialFragment {
         activity = (MainActivity) getActivity();
         if (activity.isOtherUser && activity.otherUserId != null) {
             currentUserId = activity.otherUserId;
-            mEditBtn.setVisibility(View.GONE);
         } else {
             currentUserId = UserAuth.getInstance().getCurrentUser().id;
         }
 
-        //mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference()
                 .child(StartActivity.USERS_TABLE).child(currentUserId);
 
@@ -273,8 +269,67 @@ public class ProfileFragment extends SocialFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_profile, menu);
+
+        mFollowItem = menu.findItem(R.id.follow);
+        mAddFriendItem = menu.findItem(R.id.addFriend);
+        mNewInMailItem = menu.findItem(R.id.new_in_mail);
+        mNewChatItem = menu.findItem(R.id.new_chat);
+        mEditProfileItem = menu.findItem((R.id.editProfile));
+
         if (((MainActivity) getActivity()).isOtherUser) {
-            inflater.inflate(R.menu.menu_profile, menu);
+
+            mAddFriendItem.setVisible(true);
+            mFollowItem.setVisible(true);
+            mNewInMailItem.setVisible(true);
+            mNewChatItem.setVisible(true);
+            mEditProfileItem.setVisible (false);
+
+            final String id = ((MainActivity) getActivity()).otherUserId;
+
+            FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                    .child(FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(id).exists()) {
+                        mAddFriendItem.setVisible(false);
+                        mFollowItem.setVisible(false);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+            FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                    .child(PENDING_FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(id).exists()) {
+                        mAddFriendItem.setTitle("Accept Friend Request");
+                        mFollowItem.setVisible(false);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+            FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                    .child(FOLOWING_FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(id).exists()) {
+                        mFollowItem.setTitle("UnFollow");
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
     }
 
@@ -308,19 +363,82 @@ public class ProfileFragment extends SocialFragment {
 
             return true;
         }
+
+        if (((MainActivity) getActivity()).isOtherUser) {
+            final String id = ((MainActivity) getActivity()).otherUserId;
+
+            if (item.getItemId() == R.id.addFriend) {
+
+                FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                        .child(PENDING_FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child(id).exists()) {
+                            FriendUtils.unFollowFriend(getActivity(), 0, id);
+                            mAddFriendItem.setVisible(false);
+                        } else {
+                            FriendUtils.addFriend(getActivity(), 0, id);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+
+            if (item.getItemId() == R.id.follow) {
+
+                FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).child(UserAuth.getInstance().getCurrentUser().id)
+                        .child(FOLOWING_FRIEND_LIST).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child(id).exists()) {
+                            FriendUtils.unFollowFriend(getActivity(), 1, id);
+                            mFollowItem.setTitle("Un-Followed");
+                            mFollowItem.setEnabled(false);
+                        } else {
+                            FriendUtils.addFriend(getActivity(), 1, id);
+                            mFollowItem.setTitle("Following");
+                            mFollowItem.setEnabled(false);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
+            }
+
+
+
+        }
+
+        if (item.getItemId() == R.id.editProfile) {
+
+            toggleEditMode(true);
+            mCancelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    toggleEditMode(false);
+                }
+            });
+
+            mEditProfileItem.setEnabled(false);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     private void toggleEditMode(boolean isEditMode) {
         if (isEditMode) {
-            mEditBtn.setVisibility(View.GONE);
             mUpdateBtn.setVisibility(View.VISIBLE);
             mCancelBtn.setVisibility(View.VISIBLE);
             standardView.setVisibility(View.GONE);
             editView.setVisibility(View.VISIBLE);
             mTimelineListView.setVisibility(View.GONE);
         } else {
-            mEditBtn.setVisibility(View.VISIBLE);
             mUpdateBtn.setVisibility(View.GONE);
             mCancelBtn.setVisibility(View.GONE);
             standardView.setVisibility(View.VISIBLE);

@@ -265,13 +265,6 @@
                 android:layout_height="wrap_content"
                 android:text="Cancel" />
 
-            <Button
-                android:id="@+id/edit_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Edit" />
-
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView

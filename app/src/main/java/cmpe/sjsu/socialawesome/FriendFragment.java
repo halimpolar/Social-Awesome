@@ -118,7 +118,6 @@ public class FriendFragment extends SocialFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.friendMenu:
                 mFriendTitle.setText("Friends");
