@@ -29,6 +29,7 @@ public class User implements Serializable {
     public String about_me;
     public String interest;
     public String token;
+    public String unique_id;
 
     // 0 -- disable
     // 1 -- friends only view

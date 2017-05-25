@@ -35,11 +35,11 @@
         android:maxLines="1" />
 
     <EditText
-        android:id="@+id/confirm_password"
+        android:id="@+id/uniqueSV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/confirm_password"
-        android:inputType="textPassword"
+        android:hint="Unique Id"
+        android:inputType="textCapSentences"
         android:maxLines="1" />
 
     <Button
@@ -55,14 +55,14 @@
         android:text="Sign Up" />
 
     <Button
-        android:id="@+id/verify_account"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Verify Account" />
-
-    <Button
         android:id="@+id/resend_verification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Resend Verification Email" />
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next" />
 </LinearLayout>

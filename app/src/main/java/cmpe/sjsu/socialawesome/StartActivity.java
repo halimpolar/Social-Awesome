@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -35,13 +36,14 @@ public class StartActivity extends AppCompatActivity {
     private EditText mEmailEt;
     private EditText mPasswordEt;
     private FirebaseAuth mAuth;
+    private Button mNextBtn;
     private Button mSubmitBtn;
-    private EditText mConfirmPasswordEt;
     private Button mCreateAccountTv;
-    private Button mVerifyAccount;
+    //private Button mVerifyAccount;
     private Button mResendVerification;
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
+    private EditText mUniqueId;
     private boolean mIsLogin = true;
     private String mCustomToken;
     private TokenBroadcastReceiver mTokenReceiver;
@@ -76,19 +78,23 @@ public class StartActivity extends AppCompatActivity {
         mProgressDialog.setCancelable(false);
 
         //Buttons
+        mNextBtn = (Button) findViewById(R.id.next);
         mSubmitBtn = (Button) findViewById(R.id.submit);
         mCreateAccountTv = (Button) findViewById(R.id.create_account);
-        mVerifyAccount = (Button) findViewById(R.id.verify_account);
+        //mVerifyAccount = (Button) findViewById(R.id.verify_account);
         mResendVerification = (Button) findViewById(R.id.resend_verification);
         //Fields
         mEmailEt = (EditText) findViewById(R.id.email);
         mPasswordEt = (EditText) findViewById(R.id.password);
-        mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);
+        mUniqueId = (EditText) findViewById(R.id.uniqueSV);
+        mUniqueId.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
 
-        mVerifyAccount.setVisibility(View.GONE);
+        //mVerifyAccount.setVisibility(View.GONE);
         mResendVerification.setVisibility(View.GONE);
+        mUniqueId.setVisibility(View.GONE);
+        mNextBtn.setVisibility(View.GONE);
 
         mCreateAccountTv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,13 +136,13 @@ public class StartActivity extends AppCompatActivity {
                             sendEmailVerification();
                             updateUI(user);
 
-                            mVerifyAccount.setOnClickListener(new View.OnClickListener() {
+                         /*   mVerifyAccount.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     sendEmailVerification();
                                 }
 
-                            });
+                            });*/
 
                             mResendVerification.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -148,6 +154,7 @@ public class StartActivity extends AppCompatActivity {
                             mSubmitBtn.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    mProgressDialog.show();
                                     if (!mIsLogin) {
                                         createAccount(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
                                     } else {
@@ -227,7 +234,7 @@ public class StartActivity extends AppCompatActivity {
 
             ref.child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                public void onDataChange(final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.getValue() != null) {
                         User user = dataSnapshot.getValue(User.class);
 
@@ -239,7 +246,7 @@ public class StartActivity extends AppCompatActivity {
                         UserAuth.getInstance().setCurrentUser(user);
                         launchMainActivity();
                     } else {
-                        User user = new User();
+                        final User user = new User();
                         user.id = fbUser.getUid();
                         user.email = fbUser.getEmail();
                         user.first_name = mFirstNameEt.getText().toString();
@@ -252,8 +259,43 @@ public class StartActivity extends AppCompatActivity {
                         ref.child(fbUser.getUid()).setValue(user);
                         mProgressDialog.dismiss();
                         UserAuth.getInstance().setCurrentUser(user);
-                        launchMainActivity();
-                        Log.d(TAG, "Successfully create user in db");
+                        nicknameUI();
+
+                        mNextBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                user.unique_id = mUniqueId.getText().toString();
+
+                                if (TextUtils.isEmpty(user.unique_id)) {
+                                    mUniqueId.setError("Required.");
+                                    return;
+                                } else {
+                                    ref.orderByChild("unique_id").equalTo(user.unique_id).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if(dataSnapshot.exists()) {
+                                                Toast.makeText(StartActivity.this, "Username Is Already Taken",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+                                            else {
+                                                ref.child(fbUser.getUid()).setValue(user);
+                                                UserAuth.getInstance().setCurrentUser(user);
+                                                launchMainActivity();
+                                                Log.d(TAG, "Successfully create user in db");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+
+
+                            }
+                        });
 
                     }
                 }
@@ -276,10 +318,10 @@ public class StartActivity extends AppCompatActivity {
         if (user != null) {
             mFirstNameEt.setVisibility(View.GONE);
             mLastNameEt.setVisibility(View.GONE);
-            mConfirmPasswordEt.setVisibility(View.GONE);
             mCreateAccountTv.setVisibility(View.GONE);
+            mUniqueId.setVisibility(View.VISIBLE);
             mSubmitBtn.setVisibility(View.VISIBLE);
-            mVerifyAccount.setVisibility(View.VISIBLE);
+            //mVerifyAccount.setVisibility(View.VISIBLE);
             mResendVerification.setVisibility(View.VISIBLE);
             mSubmitBtn.setText(getString(R.string.login));
 
@@ -293,7 +335,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void sendEmailVerification() {
         // Disable button
-        findViewById(R.id.verify_account).setEnabled(false);
+//        findViewById(R.id.verify_account).setEnabled(false);
 
 // Send verification email
 // [START send_email_verification]
@@ -304,7 +346,7 @@ public class StartActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         // [START_EXCLUDE]
                         // Re-enable button
-                        findViewById(R.id.verify_account).setEnabled(true);
+//                        findViewById(R.id.verify_account).setEnabled(true);
 
                         if (task.isSuccessful()) {
                             Toast.makeText(StartActivity.this,
@@ -328,15 +370,28 @@ public class StartActivity extends AppCompatActivity {
         if (isLogin) {
             mFirstNameEt.setVisibility(View.GONE);
             mLastNameEt.setVisibility(View.GONE);
-            mConfirmPasswordEt.setVisibility(View.GONE);
+            mUniqueId.setVisibility(View.GONE);
+            mNextBtn.setVisibility(View.GONE);
             mSubmitBtn.setText(getString(R.string.login));
             mCreateAccountTv.setText(getString(R.string.create_account));
         } else {
             mFirstNameEt.setVisibility(View.VISIBLE);
             mLastNameEt.setVisibility(View.VISIBLE);
-            mConfirmPasswordEt.setVisibility(View.VISIBLE);
+            mUniqueId.setVisibility(View.GONE);
+            mNextBtn.setVisibility(View.GONE);
             mSubmitBtn.setText(getString(R.string.signup));
             mCreateAccountTv.setText(R.string.signin_text);
         }
+    }
+
+    private void nicknameUI() {
+        mUniqueId.setVisibility(View.VISIBLE);
+        mNextBtn.setVisibility(View.VISIBLE);
+        mEmailEt.setVisibility(View.GONE);
+        mPasswordEt.setVisibility(View.GONE);
+        mSubmitBtn.setVisibility(View.GONE);
+        mCreateAccountTv.setVisibility(View.GONE);
+        mResendVerification.setVisibility(View.GONE);
+        //mVerifyAccount.setVisibility(View.GONE);
     }
 }
