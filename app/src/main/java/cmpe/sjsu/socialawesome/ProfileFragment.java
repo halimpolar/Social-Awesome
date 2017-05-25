@@ -75,6 +75,7 @@ public class ProfileFragment extends SocialFragment {
     private TextView mInterest;
     private TextView mFirstName;
     private TextView mLastName;
+    private TextView mUniqueId;
     private ImageView profilePicEt;
     private ImageView profilePic;
     private Button mUpdateBtn;
@@ -122,6 +123,7 @@ public class ProfileFragment extends SocialFragment {
         mProfession = (TextView) view.findViewById(R.id.professionSV);
         mAbout = (TextView) view.findViewById(R.id.about_meSV);
         mInterest = (TextView) view.findViewById(R.id.interestsSV);
+        mUniqueId = (TextView) view.findViewById(R.id.uniqueSV);
         mUpdateBtn = (Button) view.findViewById(R.id.update_btn);
         mCancelBtn = (Button) view.findViewById(R.id.cancel_btn);
         profilePic = (ImageView) view.findViewById(R.id.profilePicSV);
@@ -342,6 +344,7 @@ public class ProfileFragment extends SocialFragment {
         setTextView(mInterest, user.interest);
         setTextView(mProfession, user.profession);
         setTextView(mAbout, user.about_me);
+        setTextView(mUniqueId, user.unique_id);
     }
 
     private void populateInfoIntoEditText(User user) {
