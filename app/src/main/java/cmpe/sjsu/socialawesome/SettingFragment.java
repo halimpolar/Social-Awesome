@@ -1,5 +1,6 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,10 +35,12 @@ public class SettingFragment extends SocialFragment {
     private DatabaseReference msubData;
     private DatabaseReference msuData;
 
-    public SettingFragment() {
-        mTitle = SettingFragment.class.getSimpleName();
-    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mTitle = context.getString(R.string.setting);
 
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

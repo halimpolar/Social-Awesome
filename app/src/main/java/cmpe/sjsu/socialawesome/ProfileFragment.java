@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,13 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,11 +43,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+import cmpe.sjsu.socialawesome.Utils.DbUtils;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
 import cmpe.sjsu.socialawesome.models.Post;
 import cmpe.sjsu.socialawesome.models.User;
-import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
+
+import static cmpe.sjsu.socialawesome.InMailDetailFragment.IN_MAIL_EMAIL_ADDRESS;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -55,7 +58,7 @@ import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 public class ProfileFragment extends SocialFragment {
     private static final String TAG = ProfileFragment.class.toString();
     private static int UPLOAD_REQUEST = 31;
-
+    String userId;
     private EditText mNicknameEt;
     private EditText mEmailEt;
     private EditText mLocationEt;
@@ -64,7 +67,6 @@ public class ProfileFragment extends SocialFragment {
     private EditText mInterestEt;
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
-
     private TextView mNickname;
     private TextView mEmail;
     private TextView mLocation;
@@ -73,16 +75,12 @@ public class ProfileFragment extends SocialFragment {
     private TextView mInterest;
     private TextView mFirstName;
     private TextView mLastName;
-
     private ImageView profilePicEt;
     private ImageView profilePic;
-
     private Button mUpdateBtn;
     private Button mEditBtn;
     private Button mCancelBtn;
     private DatabaseReference mFirebaseDatabase;
-    String userId;
-
     private View editView;
     private View standardView;
     private View changeProfileBtn;
@@ -94,13 +92,14 @@ public class ProfileFragment extends SocialFragment {
     private RecyclerView mTimelineListView;
     private ArrayList<Post> postList;
 
-    public ProfileFragment()  {
+    public ProfileFragment() {
         mTitle = ProfileFragment.class.getSimpleName();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.profile_fragment, container, false);
 
         mEditBtn = (Button) view.findViewById(R.id.edit_btn);
@@ -191,8 +190,8 @@ public class ProfileFragment extends SocialFragment {
                         @Override
                         public void run() {
                             postList = new ArrayList<>();
-                            HashMap posts = ((HashMap)((HashMap)mutableData.getValue()).get("posts"));
-                            if(posts != null) {
+                            HashMap posts = ((HashMap) ((HashMap) mutableData.getValue()).get("posts"));
+                            if (posts != null) {
                                 Iterator postIterator = posts.entrySet().iterator();
                                 while (postIterator.hasNext()) {
                                     Map.Entry entry = (Map.Entry) postIterator.next();
@@ -219,7 +218,6 @@ public class ProfileFragment extends SocialFragment {
                 Log.d(TAG, "postTransaction:onComplete:" + databaseError);
             }
         });
-
 
 
         mUpdateBtn.setOnClickListener(new View.OnClickListener() {
@@ -255,7 +253,7 @@ public class ProfileFragment extends SocialFragment {
                 UserAuth.getInstance().getCurrentUser().about_me = about_me;
                 UserAuth.getInstance().getCurrentUser().interest = interest;
                 populateStandardView(UserAuth.getInstance().getCurrentUser());
-                Toast.makeText(getActivity(), "Profile Has Been Updated",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Profile Has Been Updated", Toast.LENGTH_SHORT).show();
 
                 toggleEditMode(false);
             }
@@ -268,6 +266,47 @@ public class ProfileFragment extends SocialFragment {
             }
 
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (((MainActivity) getActivity()).isOtherUser) {
+            inflater.inflate(R.menu.menu_profile, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.new_in_mail) {
+            if (((MainActivity) getActivity()).isOtherUser) {
+                final Intent intent = new Intent(getActivity(), InMailActivity.class);
+                final String id = ((MainActivity) getActivity()).otherUserId;
+
+                DbUtils.executeById(getActivity(), id, new DbUtils.OnQueryDbListener() {
+                    @Override
+                    public void execute(User user) {
+                        if (user == null) return;
+                        intent.putExtra(IN_MAIL_EMAIL_ADDRESS, user.email);
+                        intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_DETAIL);
+                        startActivity(intent);
+                    }
+                });
+            }
+            return true;
+        } else if (item.getItemId() == R.id.new_chat) {
+            if (((MainActivity) getActivity()).isOtherUser) {
+                Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
+                UserIDMap id = new UserIDMap();
+                id.id = ((MainActivity) getActivity()).otherUserId;
+                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, id);
+                intent.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_DETAIL);
+                startActivity(intent);
+            }
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void toggleEditMode(boolean isEditMode) {

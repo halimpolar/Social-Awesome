@@ -7,12 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import static cmpe.sjsu.socialawesome.InMailDetailFragment.IN_MAIL_EMAIL_ADDRESS;
+
 public class InMailActivity extends AppCompatActivity {
     public static final String ACTION_LIST = "open_list_message";
     public static final String ACTION_DETAIL = "open_new_message";
     public static final String ACTION_EXTRA = "open_new_message";
     public static final String BUNDLE_MESSAGE_ID = "bundle_message_id";
-    public static final String IN_MAIL_ACTION= "action_in_mail";
+    public static final String IN_MAIL_ACTION = "action_in_mail";
 
     private SocialFragment mFragment;
 
@@ -42,6 +44,12 @@ public class InMailActivity extends AppCompatActivity {
             if (getIntent().getStringExtra(BUNDLE_MESSAGE_ID) != null) {
                 Bundle bundle = new Bundle(1);
                 bundle.putString(BUNDLE_MESSAGE_ID, getIntent().getStringExtra(BUNDLE_MESSAGE_ID));
+                mFragment.setArguments(bundle);
+            }
+
+            if (getIntent().getStringExtra(IN_MAIL_EMAIL_ADDRESS) != null) {
+                Bundle bundle = new Bundle(1);
+                bundle.putString(IN_MAIL_EMAIL_ADDRESS, getIntent().getStringExtra(IN_MAIL_EMAIL_ADDRESS));
                 mFragment.setArguments(bundle);
             }
 
