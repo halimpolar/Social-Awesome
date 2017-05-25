@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
+import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.models.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                         signOut();
                         FirebaseAuth.getInstance().signOut();
                         startActivity(new Intent(MainActivity.this, StartActivity.class));
-                        break;
+                        return;
                     default:
                         break;
                 }
@@ -188,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void signOut() {
+        UserAuth.getInstance().setCurrentUser(null);
         if(mAuthListener != null) {
             mAuth.signOut();
         }
