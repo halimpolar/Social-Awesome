@@ -57,6 +57,11 @@ public class InMailListFragment extends SocialFragment {
                 intent.putExtra(InMailActivity.BUNDLE_MESSAGE_ID, messageId);
                 startActivity(intent);
             }
+        }, new InMailListAdapter.OnInMailMessageChangeListener() {
+            @Override
+            public void onChanged() {
+                loadMessageList();
+            }
         });
         mListView.setAdapter(mAdapter);
     }

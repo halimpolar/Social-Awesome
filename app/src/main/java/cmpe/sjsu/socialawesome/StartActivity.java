@@ -1,5 +1,6 @@
 package cmpe.sjsu.socialawesome;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import cmpe.sjsu.socialawesome.Utils.TokenBroadcastReceiver;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
+import cmpe.sjsu.socialawesome.models.PushMessageContent;
 import cmpe.sjsu.socialawesome.models.User;
 
 public class StartActivity extends AppCompatActivity {
@@ -43,10 +45,11 @@ public class StartActivity extends AppCompatActivity {
     private boolean mIsLogin = true;
     private String mCustomToken;
     private TokenBroadcastReceiver mTokenReceiver;
-
+    private ProgressDialog mProgressDialog;
 
     private void launchMainActivity() {
         Intent mainIntent = new Intent(this, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(mainIntent);
     }
 
@@ -54,7 +57,23 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_layout);
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            if (UserAuth.getInstance().getCurrentUser() != null && InMailActivity.IN_MAIL_ACTION.equals(intent.getStringExtra(PushMessageContent.ACTION_PUSH_MESSAGE))) {
+                Intent intent1 = new Intent(this, InMailActivity.class);
+                intent1.putExtra(InMailActivity.ACTION_EXTRA, InMailActivity.ACTION_LIST);
+                startActivity(intent1);
+                return;
+            }
+        }
+
+        if (UserAuth.getInstance().getCurrentUser() != null) {
+            launchMainActivity();
+        }
         mAuth = FirebaseAuth.getInstance();
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setCancelable(false);
 
         //Buttons
         mSubmitBtn = (Button) findViewById(R.id.submit);
@@ -63,9 +82,7 @@ public class StartActivity extends AppCompatActivity {
         mResendVerification = (Button) findViewById(R.id.resend_verification);
         //Fields
         mEmailEt = (EditText) findViewById(R.id.email);
-//        mEmailEt.setText("sterling.tarng@sjsu.edu");
         mPasswordEt = (EditText) findViewById(R.id.password);
-//        mPasswordEt.setText("11111");
         mConfirmPasswordEt = (EditText) findViewById(R.id.confirm_password);
         mFirstNameEt = (EditText) findViewById(R.id.first_name);
         mLastNameEt = (EditText) findViewById(R.id.last_name);
@@ -83,6 +100,7 @@ public class StartActivity extends AppCompatActivity {
         mSubmitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mProgressDialog.show();
                 if (!mIsLogin) {
                     createAccount(mEmailEt.getText().toString(), mPasswordEt.getText().toString());
                 } else {
@@ -104,6 +122,7 @@ public class StartActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        mProgressDialog.dismiss();
                         if (task.isSuccessful()) {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -170,7 +189,7 @@ public class StartActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             //TODO: Display failure message
-
+                            mProgressDialog.dismiss();
                             Toast.makeText(StartActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
@@ -216,7 +235,7 @@ public class StartActivity extends AppCompatActivity {
                             user.token = token;
                             ref.child(fbUser.getUid()).child("token").setValue(token);
                         }
-
+                        mProgressDialog.dismiss();
                         UserAuth.getInstance().setCurrentUser(user);
                         launchMainActivity();
                     } else {
@@ -225,9 +244,12 @@ public class StartActivity extends AppCompatActivity {
                         user.email = fbUser.getEmail();
                         user.first_name = mFirstNameEt.getText().toString();
                         user.last_name = mLastNameEt.getText().toString();
+                        user.status = 1;
+                        user.notification = true;
                         user.token = token;
 
                         ref.child(fbUser.getUid()).setValue(user);
+                        mProgressDialog.dismiss();
                         UserAuth.getInstance().setCurrentUser(user);
                         launchMainActivity();
                         Log.d(TAG, "Successfully create user in db");
@@ -241,46 +263,6 @@ public class StartActivity extends AppCompatActivity {
                 }
             });
 
-//            ref.child(fbUser.getUid()).runTransaction(new Transaction.Handler() {
-//                @Override
-//                public Transaction.Result doTransaction(MutableData mutableData) {
-//                    if (mutableData.getValue() != null) {
-//                        User user = mutableData.getValue(User.class);
-//
-//                        if (user != null && token != null && !token.equals(user.token)) {
-//                            user.token = token;
-//                            ref.child(fbUser.getUid()).child("token").setValue(token);
-//                        }
-//
-//                        UserAuth.getInstance().setCurrentUser(user);
-//                        launchMainActivity();
-//                    } else {
-//                        User user = new User();
-//                        user.id = fbUser.getUid();
-//                        user.email = fbUser.getEmail();
-//                        user.first_name = mFirstNameEt.getText().toString();
-//                        user.last_name = mLastNameEt.getText().toString();
-//                        user.token = token;
-//
-//                        Task task = ref.child(fbUser.getUid()).setValue(user);
-//
-//                        if (!task.isSuccessful()) {
-//                            //TODO: show text fail to save user to db
-//                            Log.e(TAG, "Fail to save user to db");
-//                        } else {
-//                            UserAuth.getInstance().setCurrentUser(user);
-//                            launchMainActivity();
-//                            Log.d(TAG, "Successfully create user in db");
-//                        }
-//                    }
-//                    return Transaction.success(mutableData);
-//                }
-//
-//                @Override
-//                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-//                }
-//            });
 
         } else {
             Toast.makeText(StartActivity.this, "Account is not Verified",

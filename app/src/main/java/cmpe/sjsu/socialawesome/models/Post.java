@@ -30,7 +30,6 @@ public class Post implements Comparable<Post>{
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("user", user);
         result.put("contentPost", contentPost);
         result.put("contentPhotoURL", contentPhotoURL);
         result.put("timestamp", timestamp);

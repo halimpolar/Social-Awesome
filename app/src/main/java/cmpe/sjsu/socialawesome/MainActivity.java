@@ -1,6 +1,8 @@
 package cmpe.sjsu.socialawesome;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -13,10 +15,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cmpe.sjsu.socialawesome.models.User;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
@@ -28,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private SocialFragment mCurrentFragment;
+
+    public String otherUserId = null;
+    public boolean isOtherUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
                         //Profile
                         title = getString(R.string.profile);
+                        isOtherUser = false;
                         fragment = new ProfileFragment();
                         break;
                     case 2:
@@ -77,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
                     case 4:
                         //Sign Out
                         title = getString(R.string.signout);
+                        signOut();
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(MainActivity.this, StartActivity.class));
                         break;
                     default:
                         break;
@@ -90,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction transaction = fm.beginTransaction();
                     transaction.replace(R.id.content_frame, fragment);
                     transaction.commit();
-
+                    mDrawerLayout.closeDrawers();
+                    setTitle(title);
                 }
             }
         });
@@ -118,8 +132,16 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
-
         }
+
+        String title = getString(R.string.timeline);
+        SocialFragment fragment = new TimeLineFragment();
+        mCurrentFragment = fragment;
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+        transaction.commit();
     }
 
     public void switchFriendToProfileFrag(boolean isOtherUser, String otherUserId){
@@ -163,5 +185,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void signOut() {
+        if(mAuthListener != null) {
+            mAuth.signOut();
+        }
+
     }
 }

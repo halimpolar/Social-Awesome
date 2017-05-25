@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
+import cmpe.sjsu.socialawesome.models.PrivateMessage;
 import cmpe.sjsu.socialawesome.models.User;
-import cmpe.sjsu.socialawesome.models.UserSummary;
+import cmpe.sjsu.socialawesome.models.UserIDMap;
 
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
@@ -31,7 +32,7 @@ public class PrivateMessageListFragment extends SocialFragment {
     final DatabaseReference mSelfRef = FirebaseDatabase.getInstance().getReference().child(USERS_TABLE)
             .child(UserAuth.getInstance().getCurrentUser().id).child(User.PRIVATE_MESSAGE);
     private RecyclerView mListView;
-    private List<UserSummary> mSummaryList = new ArrayList<>();
+    private List<UserIDMap> mUsers = new ArrayList<>();
     private MessageListAdapter mAdapter;
 
     @Override
@@ -49,12 +50,14 @@ public class PrivateMessageListFragment extends SocialFragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         mListView.setLayoutManager(llm);
 
-        mAdapter = new MessageListAdapter(mSummaryList, new MessageListAdapter.OnMessageChatClickListener() {
+        mAdapter = new MessageListAdapter(mUsers, new MessageListAdapter.OnMessageChatClickListener() {
             @Override
-            public void onClicked(UserSummary user) {
+            public void onClicked(User user) {
                 Intent intent = new Intent(getActivity(), PrivateMessageActivity.class);
                 intent.putExtra(PrivateMessageActivity.ACTION_EXTRA, PrivateMessageActivity.ACTION_DETAIL);
-                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, user);
+                UserIDMap id = new UserIDMap();
+                id.id = user.id;
+                intent.putExtra(PrivateMessageActivity.BUNDLE_OTHER_USER, id);
                 startActivity(intent);
             }
         });
@@ -72,10 +75,12 @@ public class PrivateMessageListFragment extends SocialFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                mSummaryList.clear();
+                mUsers.clear();
                 for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
-                    UserSummary summary = messageSnapshot.getValue(UserSummary.class);
-                    mSummaryList.add(summary);
+//                    PrivateMessage message = messageSnapshot.getValue(PrivateMessage.class);
+                    UserIDMap id = new UserIDMap();
+                    id.id = messageSnapshot.getKey();
+                    mUsers.add(id);
                 }
                 mAdapter.notifyDataSetChanged();
             }

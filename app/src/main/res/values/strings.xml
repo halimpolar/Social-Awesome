@@ -41,4 +41,14 @@
 
     <string name="verify_account">Account Verified</string>
 
+    <!--Dialog Message-->
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_in_mail_message">Delete in mail message?</string>
+
+    <!--Push notification message-->
+    <string name="title_inmail">In Mail</string>
+    <string name="message_inmail">You have received a message from %1$s</string>
+    <string name="email_subject_inmail">You have received a message</string>
+    <string name="email_content_inmail">The message: \n\n Subject: %1$s \n\n Content: %2$s</string>
 </resources>

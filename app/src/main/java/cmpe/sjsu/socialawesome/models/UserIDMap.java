@@ -16,8 +16,8 @@ public class UserIDMap implements Serializable {
     public String id;
 
     @Exclude
-    public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap<>();
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
         map.put("id", id);
 
         return map;
