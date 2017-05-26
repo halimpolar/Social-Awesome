@@ -256,7 +256,7 @@ public class StartActivity extends AppCompatActivity {
                         user.status = 1;
                         user.notification = true;
                         user.token = token;
-                        user.pushNotification = false;
+                        user.pushNotification = true;
 
                         ref.child(fbUser.getUid()).setValue(user);
                         mProgressDialog.dismiss();
