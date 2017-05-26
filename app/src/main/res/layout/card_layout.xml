@@ -68,17 +68,17 @@
             android:text="Accept"
             android:textAlignment="center"
             android:textSize="12dp"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/add_select_friend_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/accept_request_button"
-            android:layout_marginStart="15dp"
-            android:layout_toEndOf="@+id/accept_request_button"
             android:text="Add Friend"
-            android:visibility="gone" />
+            android:layout_alignTop="@+id/accept_request_button"
+            android:layout_toEndOf="@+id/accept_request_button"
+            android:layout_marginStart="15dp"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

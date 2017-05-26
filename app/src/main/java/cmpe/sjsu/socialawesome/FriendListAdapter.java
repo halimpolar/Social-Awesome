@@ -119,7 +119,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.child(user.id).exists()) {
-                                    holder.acceptReqBtn.setVisibility(View.GONE);
+                                    holder.acceptReqBtn.setText("Un-follow");
                                 }
                             }
 
