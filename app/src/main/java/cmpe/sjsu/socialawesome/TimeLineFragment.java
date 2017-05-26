@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -35,6 +33,14 @@ import cmpe.sjsu.socialawesome.models.User;
 import static cmpe.sjsu.socialawesome.StartActivity.USERS_TABLE;
 
 public class TimeLineFragment extends SocialFragment {
+    public static int CREATE_POST = 21;
+    public static int RESULT_OK = 1;
+    public static String POST_CONTENT_KEY = "postContentKey";
+    public static String POST_CONTENT_URL_KEY = "postContentURLKey";
+    public static String FIREBASE_POST_KEY = "posts";
+    public static String FIREBASE_FRIENDS_KEY = "friends";
+    public static String FIREBASE_FOLLOWING_KEY = "followingFriends";
+    public static String FIREBASE_FOLLOWER_KEY = "followers";
     private RecyclerView mTimelineListView;
     private FloatingActionButton mAddNewPostBtnView;
     private TimeLineAdapter mAdapter;
@@ -45,16 +51,7 @@ public class TimeLineFragment extends SocialFragment {
     private ProgressDialog progress;
     private ArrayList<String> emails;
 
-    public static int CREATE_POST = 21;
-    public static int RESULT_OK = 1;
-    public static String POST_CONTENT_KEY = "postContentKey";
-    public static String POST_CONTENT_URL_KEY = "postContentURLKey";
-    public static String FIREBASE_POST_KEY = "posts";
-    public static String FIREBASE_FRIENDS_KEY = "friends";
-    public static String FIREBASE_FOLLOWING_KEY = "followingFriends";
-    public static String FIREBASE_FOLLOWER_KEY = "followers";
-
-//    public TimeLineFragment() {
+    //    public TimeLineFragment() {
 //        mTitle = TimeLineFragment.class.getSimpleName();
 //    }
     @Override
@@ -63,6 +60,7 @@ public class TimeLineFragment extends SocialFragment {
         mTitle = context.getString(R.string.timeline);
 
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -123,7 +121,7 @@ public class TimeLineFragment extends SocialFragment {
                     while (friendIterator.hasNext()) {
                         Map.Entry friendEntry = (Map.Entry) friendIterator.next();
                         HashMap friendMap = (HashMap) usersMap.get(friendEntry.getKey().toString());
-                        if ((Boolean)friendMap.get("notification") && (Boolean)friendMap.get("pushNotification")) {
+                        if ((Boolean) friendMap.get("notification") && (Boolean) friendMap.get("pushNotification")) {
                             emails.add((String) friendMap.get("email"));
                         }
                     }
@@ -133,7 +131,7 @@ public class TimeLineFragment extends SocialFragment {
                     while (followIterator.hasNext()) {
                         Map.Entry followEntry = (Map.Entry) followIterator.next();
                         HashMap followMap = (HashMap) usersMap.get(followEntry.getKey().toString());
-                        if ((Boolean) followMap.get("notification") && (Boolean)followMap.get("pushNotification")) {
+                        if ((Boolean) followMap.get("notification") && (Boolean) followMap.get("pushNotification")) {
                             emails.add((String) followMap.get("email"));
                         }
                     }
@@ -147,6 +145,13 @@ public class TimeLineFragment extends SocialFragment {
 
             }
         });
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (progress != null) progress.dismiss();
     }
 
     private void addPostToServer(Post post) {
