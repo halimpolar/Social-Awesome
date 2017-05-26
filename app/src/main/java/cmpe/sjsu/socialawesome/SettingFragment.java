@@ -65,6 +65,9 @@ public class SettingFragment extends SocialFragment {
         boolean userPushNoSet = UserAuth.getInstance().getCurrentUser().pushNotification;
 
         switch (userStatus) {
+            case 0:
+                radio_private.setChecked(true);
+                break;
             case 1:
                 radio_friend.setChecked(true);
                 break;
