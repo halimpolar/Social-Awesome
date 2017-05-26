@@ -188,30 +188,6 @@ public class TimeLineFragment extends SocialFragment {
 
             }
         });
-
-        /*currentUserRef.child(FIREBASE_POST_KEY).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                postList = new ArrayList<>();
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    HashMap postMap = (HashMap)postSnapshot.getValue();
-                    User user = postSnapshot.child("user").getValue(User.class);
-                    Post post = new Post(UserAuth.getInstance().getCurrentUser(), (long)postMap.get("timestamp"),
-                            (String)postMap.get("contentPost"), (String)postMap.get("contentPhotoURL"));
-                    postList.add(post);
-                }
-                Collections.sort(postList);
-                mAdapter = new TimeLineAdapter(postList);
-                mTimelineListView.setAdapter(mAdapter);
-                progress.hide();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        */
     }
 
     @Override

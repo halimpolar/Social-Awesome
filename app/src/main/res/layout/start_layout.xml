@@ -38,8 +38,17 @@
         android:id="@+id/uniqueSV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Unique Id"
+        android:hint="Choose a unique screen name"
         android:inputType="textCapSentences"
+        android:maxLines="1" />
+
+    <EditText
+        android:id="@+id/verifySV"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="4 digit verification ID"
+        android:inputType="number"
         android:maxLines="1" />
 
     <Button

@@ -44,6 +44,7 @@ public class StartActivity extends AppCompatActivity {
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
     private EditText mUniqueId;
+    private EditText verifyEt;
     private boolean mIsLogin = true;
     private String mCustomToken;
     private TokenBroadcastReceiver mTokenReceiver;
@@ -90,6 +91,7 @@ public class StartActivity extends AppCompatActivity {
         mLastNameEt = (EditText) findViewById(R.id.last_name);
         mUniqueId = (EditText) findViewById(R.id.uniqueSV);
         mUniqueId.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        verifyEt = (EditText) findViewById(R.id.verifySV);
 
         //mVerifyAccount.setVisibility(View.GONE);
         mResendVerification.setVisibility(View.GONE);
@@ -382,10 +384,12 @@ public class StartActivity extends AppCompatActivity {
             mSubmitBtn.setText(getString(R.string.signup));
             mCreateAccountTv.setText(R.string.signin_text);
         }
+        verifyEt.setVisibility(View.GONE);
     }
 
     private void nicknameUI() {
         mUniqueId.setVisibility(View.VISIBLE);
+        verifyEt.setVisibility(View.VISIBLE);
         mNextBtn.setVisibility(View.VISIBLE);
         mEmailEt.setVisibility(View.GONE);
         mPasswordEt.setVisibility(View.GONE);
