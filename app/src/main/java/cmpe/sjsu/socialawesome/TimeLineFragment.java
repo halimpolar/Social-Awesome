@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import cmpe.sjsu.socialawesome.Utils.HTTPUtil;
 import cmpe.sjsu.socialawesome.Utils.UserAuth;
 import cmpe.sjsu.socialawesome.adapters.TimeLineAdapter;
 import cmpe.sjsu.socialawesome.models.Post;
@@ -41,6 +43,7 @@ public class TimeLineFragment extends SocialFragment {
     private DatabaseReference currentUserRef;
     private DatabaseReference userTableRef;
     private ProgressDialog progress;
+    private ArrayList<String> emails;
 
     public static int CREATE_POST = 21;
     public static int RESULT_OK = 1;
@@ -49,6 +52,7 @@ public class TimeLineFragment extends SocialFragment {
     public static String FIREBASE_POST_KEY = "posts";
     public static String FIREBASE_FRIENDS_KEY = "friends";
     public static String FIREBASE_FOLLOWING_KEY = "followingFriends";
+    public static String FIREBASE_FOLLOWER_KEY = "followers";
 
 //    public TimeLineFragment() {
 //        mTitle = TimeLineFragment.class.getSimpleName();
@@ -103,7 +107,45 @@ public class TimeLineFragment extends SocialFragment {
                     data.getStringExtra(POST_CONTENT_KEY), picURL);
             mAdapter.addNewPost(newPost);
             addPostToServer(newPost);
+            sendEmailToFollowers(newPost);
         }
+    }
+
+    private void sendEmailToFollowers(final Post post) {
+        userTableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap usersMap = (HashMap) dataSnapshot.getValue();
+                HashMap currentUser = (HashMap) usersMap.get(UserAuth.getInstance().getCurrentUser().id);
+                if (currentUser.get(FIREBASE_FRIENDS_KEY) != null) {
+                    Iterator friendIterator = ((HashMap) currentUser.get(FIREBASE_FRIENDS_KEY)).entrySet().iterator();
+                    while (friendIterator.hasNext()) {
+                        Map.Entry friendEntry = (Map.Entry) friendIterator.next();
+                        HashMap friendMap = (HashMap) usersMap.get(friendEntry.getKey().toString());
+                        if ((boolean)friendMap.get("notification") && (boolean)friendMap.get("pushNotification")) {
+                            emails.add((String) friendMap.get("email"));
+                        }
+                    }
+                }
+                if (currentUser.get(FIREBASE_FOLLOWER_KEY) != null) {
+                    Iterator followIterator = ((HashMap) currentUser.get(FIREBASE_FOLLOWER_KEY)).entrySet().iterator();
+                    while (followIterator.hasNext()) {
+                        Map.Entry followEntry = (Map.Entry) followIterator.next();
+                        HashMap followMap = (HashMap) usersMap.get(followEntry.getKey().toString());
+                        if ((boolean) followMap.get("notification") && (boolean)followMap.get("pushNotification")) {
+                            emails.add((String) followMap.get("email"));
+                        }
+                    }
+                }
+                HTTPUtil.sendEmail(getContext(), emails, "SocialAwesome: Someone you are following has a new post!",
+                        post.getContentPost());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void addPostToServer(Post post) {
