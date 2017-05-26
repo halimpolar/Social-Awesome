@@ -115,6 +115,7 @@ public class TimeLineFragment extends SocialFragment {
         userTableRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                emails = new ArrayList<String>();
                 HashMap usersMap = (HashMap) dataSnapshot.getValue();
                 HashMap currentUser = (HashMap) usersMap.get(UserAuth.getInstance().getCurrentUser().id);
                 if (currentUser.get(FIREBASE_FRIENDS_KEY) != null) {
@@ -122,7 +123,7 @@ public class TimeLineFragment extends SocialFragment {
                     while (friendIterator.hasNext()) {
                         Map.Entry friendEntry = (Map.Entry) friendIterator.next();
                         HashMap friendMap = (HashMap) usersMap.get(friendEntry.getKey().toString());
-                        if ((boolean)friendMap.get("notification") && (boolean)friendMap.get("pushNotification")) {
+                        if ((Boolean)friendMap.get("notification") && (Boolean)friendMap.get("pushNotification")) {
                             emails.add((String) friendMap.get("email"));
                         }
                     }
@@ -132,7 +133,7 @@ public class TimeLineFragment extends SocialFragment {
                     while (followIterator.hasNext()) {
                         Map.Entry followEntry = (Map.Entry) followIterator.next();
                         HashMap followMap = (HashMap) usersMap.get(followEntry.getKey().toString());
-                        if ((boolean) followMap.get("notification") && (boolean)followMap.get("pushNotification")) {
+                        if ((Boolean) followMap.get("notification") && (Boolean)followMap.get("pushNotification")) {
                             emails.add((String) followMap.get("email"));
                         }
                     }
